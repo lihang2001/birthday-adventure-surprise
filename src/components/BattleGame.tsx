@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import type { BattleText } from "../data";
+import { playBattleHitSound, playBattleVictorySound } from "../sound";
 import GiftBurst from "./GiftBurst";
 
 interface BattleGameProps {
@@ -65,6 +66,7 @@ export default function BattleGame({
     if (defeated) return;
 
     navigator.vibrate?.(isFinalBoss ? [28, 18, 32] : [20, 18, 26]);
+    playBattleHitSound(battle.id);
     const impactDuration = isFinalBoss ? 260 : 210;
 
     setImpacting(false);
@@ -95,6 +97,7 @@ export default function BattleGame({
     setHp((current) => {
       const next = Math.max(0, current - battle.damage);
       if (next === 0) {
+        playBattleVictorySound(battle.id);
         window.setTimeout(() => setDefeated(true), 250);
       }
       return next;

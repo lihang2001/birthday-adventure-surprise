@@ -1,0 +1,234 @@
+type BattleSoundId = "first" | "boss";
+
+type WebAudioWindow = Window &
+  typeof globalThis & {
+    webkitAudioContext?: typeof AudioContext;
+  };
+
+let audioContext: AudioContext | null = null;
+let masterGain: GainNode | null = null;
+let lastVictoryAt = 0;
+
+function getAudioContext() {
+  const AudioContextConstructor =
+    window.AudioContext ?? (window as WebAudioWindow).webkitAudioContext;
+
+  if (!AudioContextConstructor) return null;
+
+  if (!audioContext) {
+    audioContext = new AudioContextConstructor();
+    masterGain = audioContext.createGain();
+    masterGain.gain.value = 0.24;
+    masterGain.connect(audioContext.destination);
+  }
+
+  if (audioContext.state === "suspended") {
+    void audioContext.resume();
+  }
+
+  return audioContext;
+}
+
+function connectOutput(node: AudioNode, context: AudioContext) {
+  node.connect(masterGain ?? context.destination);
+}
+
+function playTone(
+  context: AudioContext,
+  {
+    startFrequency,
+    endFrequency,
+    duration,
+    delay = 0,
+    volume,
+    type = "sine",
+  }: {
+    startFrequency: number;
+    endFrequency?: number;
+    duration: number;
+    delay?: number;
+    volume: number;
+    type?: OscillatorType;
+  },
+) {
+  const startAt = context.currentTime + delay;
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(startFrequency, startAt);
+  if (endFrequency) {
+    oscillator.frequency.exponentialRampToValueAtTime(
+      Math.max(endFrequency, 1),
+      startAt + duration,
+    );
+  }
+
+  gain.gain.setValueAtTime(0.0001, startAt);
+  gain.gain.exponentialRampToValueAtTime(volume, startAt + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+
+  oscillator.connect(gain);
+  connectOutput(gain, context);
+  oscillator.start(startAt);
+  oscillator.stop(startAt + duration + 0.03);
+}
+
+function playNoise(
+  context: AudioContext,
+  {
+    duration,
+    delay = 0,
+    volume,
+    filterType,
+    frequency,
+  }: {
+    duration: number;
+    delay?: number;
+    volume: number;
+    filterType: BiquadFilterType;
+    frequency: number;
+  },
+) {
+  const sampleCount = Math.max(1, Math.floor(context.sampleRate * duration));
+  const buffer = context.createBuffer(1, sampleCount, context.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for (let index = 0; index < sampleCount; index += 1) {
+    const fade = 1 - index / sampleCount;
+    data[index] = (Math.random() * 2 - 1) * fade;
+  }
+
+  const startAt = context.currentTime + delay;
+  const source = context.createBufferSource();
+  const filter = context.createBiquadFilter();
+  const gain = context.createGain();
+
+  source.buffer = buffer;
+  filter.type = filterType;
+  filter.frequency.setValueAtTime(frequency, startAt);
+  gain.gain.setValueAtTime(0.0001, startAt);
+  gain.gain.exponentialRampToValueAtTime(volume, startAt + 0.008);
+  gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+
+  source.connect(filter);
+  filter.connect(gain);
+  connectOutput(gain, context);
+  source.start(startAt);
+  source.stop(startAt + duration + 0.02);
+}
+
+function playPunch(context: AudioContext, intensity = 1) {
+  playTone(context, {
+    startFrequency: 145,
+    endFrequency: 58,
+    duration: 0.12,
+    volume: 0.34 * intensity,
+    type: "sine",
+  });
+  playTone(context, {
+    startFrequency: 70,
+    endFrequency: 42,
+    duration: 0.18,
+    delay: 0.025,
+    volume: 0.18 * intensity,
+    type: "triangle",
+  });
+  playNoise(context, {
+    duration: 0.07,
+    volume: 0.22 * intensity,
+    filterType: "lowpass",
+    frequency: 720,
+  });
+}
+
+function playMagic(context: AudioContext) {
+  playTone(context, {
+    startFrequency: 580,
+    endFrequency: 1160,
+    duration: 0.16,
+    volume: 0.11,
+    type: "triangle",
+  });
+  playTone(context, {
+    startFrequency: 920,
+    endFrequency: 1640,
+    duration: 0.12,
+    delay: 0.035,
+    volume: 0.08,
+    type: "sine",
+  });
+  playNoise(context, {
+    duration: 0.11,
+    delay: 0.01,
+    volume: 0.09,
+    filterType: "highpass",
+    frequency: 1800,
+  });
+}
+
+function playSword(context: AudioContext) {
+  playNoise(context, {
+    duration: 0.09,
+    volume: 0.14,
+    filterType: "highpass",
+    frequency: 1600,
+  });
+  playTone(context, {
+    startFrequency: 1550,
+    endFrequency: 540,
+    duration: 0.1,
+    delay: 0.012,
+    volume: 0.09,
+    type: "sawtooth",
+  });
+}
+
+export function playBattleHitSound(id: BattleSoundId) {
+  const context = getAudioContext();
+  if (!context) return;
+
+  if (id === "first") {
+    playPunch(context, 0.82);
+    return;
+  }
+
+  playPunch(context, 0.95);
+
+  const style = Math.floor(Math.random() * 3);
+  if (style === 0) {
+    playMagic(context);
+  } else if (style === 1) {
+    playSword(context);
+  } else {
+    playMagic(context);
+    playSword(context);
+  }
+}
+
+export function playBattleVictorySound(id: BattleSoundId) {
+  const context = getAudioContext();
+  if (!context) return;
+
+  const now = performance.now();
+  if (now - lastVictoryAt < 500) return;
+  lastVictoryAt = now;
+
+  const base = id === "boss" ? 392 : 440;
+  [0, 1, 2, 4].forEach((step, index) => {
+    playTone(context, {
+      startFrequency: base * 2 ** (step / 12),
+      duration: 0.15,
+      delay: index * 0.075,
+      volume: 0.1,
+      type: "triangle",
+    });
+  });
+  playNoise(context, {
+    duration: 0.18,
+    delay: 0.12,
+    volume: 0.05,
+    filterType: "highpass",
+    frequency: 2200,
+  });
+}
