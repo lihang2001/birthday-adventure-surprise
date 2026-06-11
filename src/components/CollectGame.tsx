@@ -6,6 +6,11 @@ import {
   type PointerEvent,
 } from "react";
 import type { CollectLevelText } from "../data";
+import {
+  playCollectBadSound,
+  playCollectGoodSound,
+  primeGameAudio,
+} from "../sound";
 import GiftBurst from "./GiftBurst";
 
 interface CollectGameProps {
@@ -142,6 +147,7 @@ export default function CollectGame({ level, onContinue }: CollectGameProps) {
         const collectedItem =
           level.goodItems[collectedRef.current % level.goodItems.length] ?? "好运";
         const nextCollected = collectedRef.current + 1;
+        playCollectGoodSound();
         collectedRef.current = nextCollected;
         setCollected(nextCollected);
 
@@ -166,6 +172,7 @@ export default function CollectGame({ level, onContinue }: CollectGameProps) {
 
       if (touchedMonster && now - lastHitAt.current > 1050) {
         lastHitAt.current = now;
+        playCollectBadSound();
         const nextLives = livesRef.current - 1;
         if (nextLives <= 0) {
           livesRef.current = level.lives;
@@ -196,6 +203,7 @@ export default function CollectGame({ level, onContinue }: CollectGameProps) {
     const rect = arenaRef.current?.getBoundingClientRect();
     if (!rect) return;
 
+    primeGameAudio();
     arenaRef.current?.setPointerCapture(event.pointerId);
     dragOffset.current = {
       x: event.clientX - rect.left - playerRef.current.x,

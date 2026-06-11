@@ -1,5 +1,20 @@
 type BattleSoundId = "first" | "boss";
 
+const punchSounds = [
+  "/audio/punch-heavy-1.ogg",
+  "/audio/punch-heavy-2.ogg",
+  "/audio/punch-medium-1.ogg",
+];
+
+const metalSounds = [
+  "/audio/metal-heavy-1.ogg",
+  "/audio/metal-medium-1.ogg",
+  "/audio/blade-clash-1.ogg",
+];
+
+const collectGoodSounds = ["/audio/collect-good-1.ogg", "/audio/collect-good-2.ogg"];
+const collectBadSounds = ["/audio/collect-bad-1.ogg"];
+
 type WebAudioWindow = Window &
   typeof globalThis & {
     webkitAudioContext?: typeof AudioContext;
@@ -8,6 +23,7 @@ type WebAudioWindow = Window &
 let audioContext: AudioContext | null = null;
 let masterGain: GainNode | null = null;
 let lastVictoryAt = 0;
+const audioCache = new Map<string, HTMLAudioElement>();
 
 function getAudioContext() {
   const AudioContextConstructor =
@@ -31,6 +47,38 @@ function getAudioContext() {
 
 function connectOutput(node: AudioNode, context: AudioContext) {
   node.connect(masterGain ?? context.destination);
+}
+
+function getAudio(src: string) {
+  const cached = audioCache.get(src);
+  if (cached) return cached;
+
+  const audio = new Audio(src);
+  audio.preload = "auto";
+  audioCache.set(src, audio);
+  return audio;
+}
+
+function randomItem(items: string[]) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function playAsset(
+  src: string,
+  {
+    volume = 0.8,
+    playbackRate = 1,
+  }: {
+    volume?: number;
+    playbackRate?: number;
+  } = {},
+) {
+  const baseAudio = getAudio(src);
+  const audio = baseAudio.cloneNode(true) as HTMLAudioElement;
+  audio.volume = Math.min(Math.max(volume, 0), 1);
+  audio.playbackRate = playbackRate;
+  audio.currentTime = 0;
+  void audio.play().catch(() => undefined);
 }
 
 function playTone(
@@ -120,25 +168,25 @@ function playNoise(
 
 function playPunch(context: AudioContext, intensity = 1) {
   playTone(context, {
-    startFrequency: 145,
-    endFrequency: 58,
-    duration: 0.12,
-    volume: 0.34 * intensity,
+    startFrequency: 94,
+    endFrequency: 32,
+    duration: 0.16,
+    volume: 0.5 * intensity,
     type: "sine",
   });
   playTone(context, {
-    startFrequency: 70,
-    endFrequency: 42,
-    duration: 0.18,
-    delay: 0.025,
-    volume: 0.18 * intensity,
-    type: "triangle",
+    startFrequency: 190,
+    endFrequency: 74,
+    duration: 0.07,
+    delay: 0.005,
+    volume: 0.2 * intensity,
+    type: "square",
   });
   playNoise(context, {
-    duration: 0.07,
-    volume: 0.22 * intensity,
+    duration: 0.045,
+    volume: 0.34 * intensity,
     filterType: "lowpass",
-    frequency: 720,
+    frequency: 980,
   });
 }
 
@@ -169,40 +217,73 @@ function playMagic(context: AudioContext) {
 
 function playSword(context: AudioContext) {
   playNoise(context, {
-    duration: 0.09,
-    volume: 0.14,
+    duration: 0.075,
+    volume: 0.24,
     filterType: "highpass",
-    frequency: 1600,
+    frequency: 1850,
   });
   playTone(context, {
-    startFrequency: 1550,
-    endFrequency: 540,
-    duration: 0.1,
+    startFrequency: 1920,
+    endFrequency: 620,
+    duration: 0.12,
     delay: 0.012,
-    volume: 0.09,
+    volume: 0.13,
     type: "sawtooth",
+  });
+}
+
+export function primeGameAudio() {
+  void getAudioContext();
+  [
+    ...punchSounds,
+    ...metalSounds,
+    ...collectGoodSounds,
+    ...collectBadSounds,
+  ].forEach((src) => {
+    getAudio(src).load();
   });
 }
 
 export function playBattleHitSound(id: BattleSoundId) {
   const context = getAudioContext();
-  if (!context) return;
 
   if (id === "first") {
-    playPunch(context, 0.82);
+    playAsset(randomItem(punchSounds), {
+      volume: 0.92,
+      playbackRate: 0.94 + Math.random() * 0.1,
+    });
+    if (context) playPunch(context, 0.95);
     return;
   }
 
-  playPunch(context, 0.95);
+  playAsset(randomItem(punchSounds), {
+    volume: 0.82,
+    playbackRate: 0.92 + Math.random() * 0.12,
+  });
+  if (context) playPunch(context, 1);
 
   const style = Math.floor(Math.random() * 3);
   if (style === 0) {
-    playMagic(context);
+    playAsset(randomItem(metalSounds), {
+      volume: 0.72,
+      playbackRate: 0.96 + Math.random() * 0.12,
+    });
+    if (context) playMagic(context);
   } else if (style === 1) {
-    playSword(context);
+    playAsset(randomItem(metalSounds), {
+      volume: 0.82,
+      playbackRate: 0.88 + Math.random() * 0.16,
+    });
+    if (context) playSword(context);
   } else {
-    playMagic(context);
-    playSword(context);
+    playAsset(randomItem(metalSounds), {
+      volume: 0.76,
+      playbackRate: 0.98 + Math.random() * 0.08,
+    });
+    if (context) {
+      playMagic(context);
+      playSword(context);
+    }
   }
 }
 
@@ -230,5 +311,41 @@ export function playBattleVictorySound(id: BattleSoundId) {
     volume: 0.05,
     filterType: "highpass",
     frequency: 2200,
+  });
+}
+
+export function playCollectGoodSound() {
+  primeGameAudio();
+  playAsset(randomItem(collectGoodSounds), {
+    volume: 0.72,
+    playbackRate: 1 + Math.random() * 0.08,
+  });
+
+  const context = getAudioContext();
+  if (!context) return;
+  playTone(context, {
+    startFrequency: 880,
+    endFrequency: 1320,
+    duration: 0.11,
+    volume: 0.08,
+    type: "triangle",
+  });
+}
+
+export function playCollectBadSound() {
+  primeGameAudio();
+  playAsset(randomItem(collectBadSounds), {
+    volume: 0.68,
+    playbackRate: 0.94,
+  });
+
+  const context = getAudioContext();
+  if (!context) return;
+  playTone(context, {
+    startFrequency: 190,
+    endFrequency: 95,
+    duration: 0.12,
+    volume: 0.12,
+    type: "sawtooth",
   });
 }
