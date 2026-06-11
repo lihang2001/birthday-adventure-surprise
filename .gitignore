@@ -1,0 +1,11 @@
+node_modules
+dist
+work
+outputs
+.env
+.env.*
+*.log
+vite-dev.out.log
+vite-dev.err.log
+.DS_Store
+Thumbs.db
