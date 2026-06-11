@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { memoryPageText, type Memory } from "../data";
+import { useEffect, useRef, useState } from "react";
+import { albumBgm, memoryPageText, type Memory } from "../data";
 import PlaceholderImage from "./PlaceholderImage";
 
 interface MemoryGalleryProps {
@@ -15,12 +15,42 @@ export default function MemoryGallery({
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [dragStart, setDragStart] = useState<number | null>(null);
+  const [bgmState, setBgmState] = useState<"idle" | "playing" | "missing">(
+    "idle",
+  );
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const current = memories[active];
   const currentPhotos = current.images;
   const currentPhoto = currentPhotos[selectedPhoto] ?? currentPhotos[0];
   const previewPhotos = currentPhotos.slice(0, 4);
   const hiddenPhotoCount = Math.max(currentPhotos.length - previewPhotos.length, 0);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+    };
+  }, []);
+
+  const toggleBgm = async () => {
+    const audio = audioRef.current;
+    if (!audio || bgmState === "missing") return;
+
+    if (bgmState === "playing") {
+      audio.pause();
+      setBgmState("idle");
+      return;
+    }
+
+    try {
+      audio.volume = 0.38;
+      audio.loop = true;
+      await audio.play();
+      setBgmState("playing");
+    } catch {
+      setBgmState("idle");
+    }
+  };
 
   const goToMemory = (index: number) => {
     setActive(index);
@@ -68,6 +98,38 @@ export default function MemoryGallery({
         <p className="eyebrow">{memoryPageText.eyebrow}</p>
         <h1>{memoryPageText.title}</h1>
         <p>{memoryPageText.subtitle}</p>
+      </div>
+
+      <div className={`memory-bgm ${bgmState === "playing" ? "is-playing" : ""}`}>
+        <audio
+          ref={audioRef}
+          src={albumBgm.src}
+          preload="none"
+          loop
+          onError={() => setBgmState("missing")}
+        />
+        <button
+          type="button"
+          onClick={toggleBgm}
+          disabled={bgmState === "missing"}
+          aria-pressed={bgmState === "playing"}
+        >
+          <span className="bgm-disc" aria-hidden="true">
+            <span />
+          </span>
+          <span>
+            <strong>{albumBgm.title}</strong>
+            <small>
+              {bgmState === "missing"
+                ? albumBgm.missingText
+                : bgmState === "playing"
+                  ? albumBgm.pauseText
+                  : albumBgm.playText}
+              {" · "}
+              {albumBgm.artist}
+            </small>
+          </span>
+        </button>
       </div>
 
       <div className="memory-stage">

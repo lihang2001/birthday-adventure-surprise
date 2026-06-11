@@ -343,6 +343,15 @@ export const memoryPageText = {
   closeLabel: "关闭",
 };
 
+export const albumBgm = {
+  src: "/audio/album-bgm.mp3",
+  title: "弹给路小雨的吉他",
+  artist: "Jazzzcz",
+  playText: "播放 BGM",
+  pauseText: "暂停 BGM",
+  missingText: "BGM 待放入",
+};
+
 export const bossBattle: BattleText = {
   id: "boss",
   eyebrow: "Final Battle",
