@@ -8,6 +8,36 @@ interface FinalRevealProps {
   onRestart: () => void;
 }
 
+function FinalMedia({
+  item,
+}: {
+  item: FinalGiftText["cakeImage"] | FinalGiftText["finalPhoto"];
+}) {
+  if ("type" in item && item.type === "video") {
+    return (
+      <video
+        className="soft-image final-photo final-video"
+        src={item.src}
+        aria-label={item.alt}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="metadata"
+      />
+    );
+  }
+
+  return (
+    <PlaceholderImage
+      className="final-photo"
+      src={item.src}
+      alt={item.alt}
+      label={item.label}
+    />
+  );
+}
+
 export default function FinalReveal({ text, onRestart }: FinalRevealProps) {
   const [secretOpen, setSecretOpen] = useState(false);
   const openSecret = () => {
@@ -39,18 +69,8 @@ export default function FinalReveal({ text, onRestart }: FinalRevealProps) {
         <p className="final-next">{text.nextLine}</p>
 
         <div className="final-photo-grid">
-          <PlaceholderImage
-            className="final-photo"
-            src={text.cakeImage.src}
-            alt={text.cakeImage.alt}
-            label={text.cakeImage.label}
-          />
-          <PlaceholderImage
-            className="final-photo"
-            src={text.finalPhoto.src}
-            alt={text.finalPhoto.alt}
-            label={text.finalPhoto.label}
-          />
+          <FinalMedia item={text.cakeImage} />
+          <FinalMedia item={text.finalPhoto} />
         </div>
 
         <div className="blessing-card">

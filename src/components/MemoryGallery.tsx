@@ -237,15 +237,18 @@ export default function MemoryGallery({
         </button>
       </div>
 
-      <div className="memory-dots" aria-label="照片位置">
+      <div className="memory-dots memory-page-links" aria-label="相册分页">
         {memories.map((memory, index) => (
           <button
             className={index === active ? "is-active" : ""}
             key={`${memory.date || "memory"}-${memory.title || "untitled"}-${index}`}
             type="button"
             onClick={() => goToMemory(index)}
-            aria-label={`第 ${index + 1} 页`}
-          />
+            aria-label={`跳到第 ${index + 1} 页`}
+          >
+            <span>{index + 1}</span>
+            <small>{memory.date || "照片集"}</small>
+          </button>
         ))}
       </div>
 

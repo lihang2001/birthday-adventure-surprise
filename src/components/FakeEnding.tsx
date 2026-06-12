@@ -1,9 +1,41 @@
 import { useState } from "react";
-import { fakeEndingText } from "../data";
+import { fakeEndingText, type GiftImage } from "../data";
 import PlaceholderImage from "./PlaceholderImage";
 
 interface FakeEndingProps {
   onContinue: () => void;
+}
+
+function EndingMedia({
+  item,
+  className,
+}: {
+  item: GiftImage;
+  className: string;
+}) {
+  if (item.type === "video") {
+    return (
+      <video
+        className={`soft-image ${className} ending-video`}
+        src={item.src}
+        aria-label={item.alt}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="metadata"
+      />
+    );
+  }
+
+  return (
+    <PlaceholderImage
+      className={className}
+      src={item.src}
+      alt={item.alt}
+      label={item.label}
+    />
+  );
 }
 
 export default function FakeEnding({ onContinue }: FakeEndingProps) {
@@ -36,12 +68,7 @@ export default function FakeEnding({ onContinue }: FakeEndingProps) {
 
       <div className="ending-photo-set">
         <div className="ending-main-frame">
-          <PlaceholderImage
-            className="ending-main-photo"
-            src={currentPhoto.src}
-            alt={currentPhoto.alt}
-            label={currentPhoto.label}
-          />
+          <EndingMedia item={currentPhoto} className="ending-main-photo" />
           {hasMultiplePhotos && (
             <>
               <button
@@ -76,12 +103,7 @@ export default function FakeEnding({ onContinue }: FakeEndingProps) {
               onClick={() => setActivePhoto(index)}
               aria-label={`查看照片 ${index + 1}`}
             >
-              <PlaceholderImage
-                className="ending-thumb-photo"
-                src={photo.src}
-                alt={photo.alt}
-                label={`${index + 1}`}
-              />
+              <EndingMedia item={photo} className="ending-thumb-photo" />
             </button>
           ))}
         </div>

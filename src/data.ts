@@ -225,6 +225,11 @@ export const memories: Memory[] = [
     title: "夜市和路边摊",
     images: [
       {
+        src: "/photos/memory-0528-food.jpg",
+        alt: "5.28 晚上的宵夜和路边摊",
+        label: "图 1",
+      },
+      {
         src: "/photos/memory-weihai-02.jpg",
         alt: "5.28 飞机上的侧影",
         label: "图 2",
@@ -252,14 +257,16 @@ export const memories: Memory[] = [
     title: "电动车和小醉",
     images: [
       {
-        src: "/photos/memory-weihai-14.jpg",
-        alt: "5.29 晚上的贴贴合照",
-        label: "图 1",
+        src: "/videos/memory-0529-01.mp4",
+        alt: "5.29 的小视频 1",
+        label: "视频 1",
+        type: "video",
       },
       {
-        src: "/photos/memory-weihai-15.jpg",
-        alt: "5.29 晚上的可爱合照",
-        label: "图 2",
+        src: "/videos/memory-0529-02.mp4",
+        alt: "5.29 的小视频 2",
+        label: "视频 2",
+        type: "video",
       },
     ],
     diary: `我们租了电动车
@@ -360,23 +367,6 @@ export const memories: Memory[] = [
 生病了我的宝宝
 恐怕被我传染了
 默默滴眼泪可怜死了`,
-  },
-  {
-    date: "6.12",
-    title: "偷偷准备礼物",
-    images: [
-      {
-        src: "/videos/memory-0612.mp4",
-        alt: "6.12 偷偷准备礼物的视频",
-        label: "视频",
-        type: "video",
-      },
-    ],
-    diary: `偷偷去给你准备礼物
-心里琢磨了半天
-感觉你一定会喜欢
-偷偷摸摸的
-给你准备礼物特别开心`,
   },
   {
     date: "",
@@ -521,6 +511,23 @@ export const memories: Memory[] = [
 在忙的工作或者学习之后，见到你也能立刻充满电。
 模糊的照片记录不完我们的幸福。`,
   },
+  {
+    date: "6.12",
+    title: "偷偷准备礼物",
+    images: [
+      {
+        src: "/videos/memory-0612.mp4",
+        alt: "6.12 偷偷准备礼物的视频",
+        label: "视频",
+        type: "video",
+      },
+    ],
+    diary: `偷偷去给你准备礼物
+心里琢磨了半天
+感觉你一定会喜欢
+偷偷摸摸的
+给你准备礼物特别开心`,
+  },
 ];
 
 export const memoryIntroText = {
@@ -564,7 +571,7 @@ export const bossBattle: BattleText = {
   subtitle: "它挡在回忆相册前面，这次要认真打。",
   hpLabel: "魔王 HP",
   attackLabel: "攻击贱眼魔王",
-  hp: 260,
+  hp: 350,
   damage: 20,
   lines: [
     "最后一关了，敢不敢打重点？",
@@ -607,6 +614,12 @@ export const fakeEndingText = {
       src: "/photos/ending-04.jpg",
       alt: "最后一页照片 4",
       label: "ending-04.jpg",
+    },
+    {
+      src: "/videos/ending-extra-video.mp4",
+      alt: "海边的小视频",
+      label: "短视频",
+      type: "video",
     },
     {
       src: "/photos/ending-05.jpg",
@@ -669,18 +682,20 @@ export const finalGiftText = {
   secretTitle: "竟然被你发现了神秘大奖？",
   secretName: "神秘大奖",
   secretDescription:
-    "这里确实藏着一个神秘大奖，但内容先不剧透。等它真正出现的时候，你就知道了。",
+    "这里确实藏着一个神秘大奖，但内容先不剧透。等它真正出现的时候，你就知道了。现在亲亲你的最爱的老公。",
   secretCloseText: "先收下这份神秘感",
   nextLine: "还有最后几张照片和最后几句话。",
   cakeImage: {
-    src: "/photos/cake.jpg",
-    alt: "生日蛋糕照片",
-    label: "cake.jpg",
+    src: "/videos/final-loop-01.mp4",
+    alt: "最后一页循环短视频 1",
+    label: "短视频 1",
+    type: "video",
   },
   finalPhoto: {
-    src: "/photos/us-final.jpg",
-    alt: "两人合照",
-    label: "us-final.jpg",
+    src: "/videos/final-loop-02.mp4",
+    alt: "最后一页循环短视频 2",
+    label: "短视频 2",
+    type: "video",
   },
   blessing: [
     "生日快乐。",
@@ -688,7 +703,7 @@ export const finalGiftText = {
     "希望你新的一岁可以开心一点、轻松一点，遇到的事情都顺利一点，也希望我可以继续陪在你身边，一起吃饭、散步、拍照，一起过很多个普通但很好的日子。",
     "今天的礼物是给你的，今天的祝福也是给你的。",
     "生日快乐。",
-    "我爱你。",
+    "一直很爱你宝宝。",
   ],
   restartText: "重新开始",
 };

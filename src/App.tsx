@@ -7,6 +7,7 @@ import FakeEnding from "./components/FakeEnding";
 import FinalReveal from "./components/FinalReveal";
 import GiftReveal from "./components/GiftReveal";
 import MemoryGallery from "./components/MemoryGallery";
+import PixelCompanions from "./components/PixelCompanions";
 import {
   albumBgm,
   bossBattle,
@@ -147,6 +148,7 @@ export default function App() {
           {content[visibleScene]}
         </section>
       </main>
+      <PixelCompanions />
     </div>
   );
 }

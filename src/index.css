@@ -60,6 +60,141 @@ button {
   padding: 18px 16px 34px;
 }
 
+.pixel-companions {
+  position: fixed;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  z-index: 30;
+  pointer-events: none;
+}
+
+.pixel-stage {
+  position: relative;
+  display: flex;
+  width: 128px;
+  height: 82px;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0;
+  border: 1px solid rgba(33, 27, 29, 0.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 246, 0.82), rgba(246, 203, 216, 0.52)),
+    rgba(255, 252, 246, 0.76);
+  box-shadow: 0 14px 28px rgba(33, 27, 29, 0.14);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.pixel-stage::before {
+  position: absolute;
+  inset: auto 12px 12px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(33, 27, 29, 0.12);
+  content: "";
+}
+
+.pixel-pet {
+  position: relative;
+  z-index: 1;
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 8px 8px rgba(33, 27, 29, 0.16));
+}
+
+.pixel-girl-pet {
+  animation: pixel-girl-hit 1.24s steps(2, end) infinite;
+}
+
+.pixel-boy-pet {
+  margin-left: -8px;
+  animation: pixel-boy-hit 1.24s steps(2, end) infinite;
+}
+
+.pixel-hit {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  border: 1px solid rgba(199, 169, 108, 0.45);
+  border-radius: 999px;
+  padding: 2px 5px;
+  background: rgba(255, 252, 246, 0.86);
+  color: #9a6f2f;
+  font-size: 0.64rem;
+  font-weight: 900;
+  opacity: 0;
+}
+
+.hit-left {
+  left: 38px;
+  animation: pixel-hit-left 1.24s steps(1, end) infinite;
+}
+
+.hit-right {
+  right: 34px;
+  animation: pixel-hit-right 1.24s steps(1, end) infinite;
+}
+
+@keyframes pixel-boy-hit {
+  0%,
+  42%,
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+
+  18% {
+    transform: translateX(-10px) translateY(-3px) rotate(-8deg);
+  }
+}
+
+@keyframes pixel-girl-hit {
+  0%,
+  45%,
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+
+  68% {
+    transform: translateX(10px) translateY(-3px) rotate(8deg);
+  }
+}
+
+@keyframes pixel-hit-left {
+  0%,
+  28% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1);
+  }
+
+  29%,
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.82);
+  }
+}
+
+@keyframes pixel-hit-right {
+  0%,
+  55% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.82);
+  }
+
+  56%,
+  82% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1);
+  }
+
+  83%,
+  100% {
+    opacity: 0;
+  }
+}
+
 .screen {
   position: relative;
   display: flex;
@@ -3268,6 +3403,11 @@ p {
   pointer-events: none;
 }
 
+.ending-video,
+.final-video {
+  object-fit: cover;
+}
+
 .memory-video-badge {
   position: absolute;
   right: 8px;
@@ -3366,11 +3506,7 @@ p {
 }
 
 .memory-dots button {
-  width: 7px;
-  height: 7px;
   border: 0;
-  border-radius: 999px;
-  background: rgba(33, 27, 29, 0.2);
   cursor: pointer;
   transition:
     width 180ms ease,
@@ -3378,8 +3514,61 @@ p {
 }
 
 .memory-dots button.is-active {
-  width: 20px;
   background: var(--gold);
+}
+
+.memory-page-links {
+  width: 100%;
+  justify-content: flex-start;
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  scrollbar-width: none;
+}
+
+.memory-page-links::-webkit-scrollbar {
+  display: none;
+}
+
+.memory-page-links button {
+  display: grid;
+  flex: 0 0 auto;
+  min-width: 48px;
+  gap: 2px;
+  justify-items: center;
+  border: 1px solid rgba(33, 27, 29, 0.12);
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(255, 252, 246, 0.72);
+  color: var(--muted);
+  box-shadow: 0 8px 14px rgba(60, 38, 45, 0.06);
+}
+
+.memory-page-links button span {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.memory-page-links button small {
+  max-width: 4.8em;
+  overflow: hidden;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memory-page-links button.is-active {
+  border-color: rgba(199, 169, 108, 0.62);
+  background:
+    linear-gradient(135deg, rgba(255, 252, 246, 0.95), rgba(235, 210, 158, 0.62)),
+    rgba(255, 252, 246, 0.9);
+  color: #8b7041;
+  box-shadow:
+    0 10px 18px rgba(199, 169, 108, 0.14),
+    0 0 0 2px rgba(255, 246, 219, 0.86);
 }
 
 .modal-backdrop {
