@@ -4,6 +4,7 @@ export type SceneId =
   | "firstGift"
   | "collectHearts"
   | "secondGift"
+  | "memoryIntro"
   | "memories"
   | "bossBattle"
   | "fakeEnding"
@@ -44,7 +45,7 @@ export interface GiftReward {
 
 export interface Memory {
   date: string;
-  title: string;
+  title?: string;
   images: GiftImage[];
   diary: string;
 }
@@ -76,6 +77,7 @@ export const sceneLabels: Record<SceneId, string> = {
   firstGift: "礼物",
   collectHearts: "收集",
   secondGift: "礼物",
+  memoryIntro: "解锁",
   memories: "相册",
   bossBattle: "Boss",
   fakeEnding: "结尾",
@@ -377,8 +379,7 @@ export const memories: Memory[] = [
 给你准备礼物特别开心`,
   },
   {
-    date: "6.12 之后",
-    title: "见到你就充满电",
+    date: "",
     images: [
       {
         src: "/photos/memory-after-0612-01.jpg",
@@ -517,9 +518,19 @@ export const memories: Memory[] = [
       },
     ],
     diary: `和你在一起，度过了一段非常快乐的时光。
-在忙的工作或者学习之后，见到你也能立刻充满电。`,
+在忙的工作或者学习之后，见到你也能立刻充满电。
+模糊的照片记录不完我们的幸福。`,
   },
 ];
+
+export const memoryIntroText = {
+  eyebrow: "Album Unlocked",
+  title: "回忆相册已解锁",
+  subtitle:
+    "刚刚打败 Boss 掉出来的不是普通钥匙，是一整本慢慢翻开的回忆。",
+  note: "前面不是新的关卡了，接下来是我们一起走过的一小段路。",
+  button: "打开回忆相册",
+};
 
 export const memoryPageText = {
   eyebrow: "Memory Album",

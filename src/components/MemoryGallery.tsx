@@ -221,8 +221,8 @@ export default function MemoryGallery({
             )}
           </div>
           <div className="memory-copy">
-            <time>{current.date}</time>
-            <h2>{current.title}</h2>
+            {current.date && <time>{current.date}</time>}
+            {current.title && <h2>{current.title}</h2>}
             <p>{current.diary}</p>
           </div>
         </article>
@@ -241,7 +241,7 @@ export default function MemoryGallery({
         {memories.map((memory, index) => (
           <button
             className={index === active ? "is-active" : ""}
-            key={`${memory.date}-${memory.title}`}
+            key={`${memory.date || "memory"}-${memory.title || "untitled"}-${index}`}
             type="button"
             onClick={() => goToMemory(index)}
             aria-label={`第 ${index + 1} 页`}
@@ -303,8 +303,8 @@ export default function MemoryGallery({
               </div>
             )}
             <div className="memory-copy modal-copy">
-              <time>{current.date}</time>
-              <h2>{current.title}</h2>
+              {current.date && <time>{current.date}</time>}
+              {current.title && <h2>{current.title}</h2>}
               <p>{current.diary}</p>
             </div>
           </div>

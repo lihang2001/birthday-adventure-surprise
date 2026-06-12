@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import AlbumIntro from "./components/AlbumIntro";
 import BattleGame from "./components/BattleGame";
 import CollectGame from "./components/CollectGame";
 import CoverScreen from "./components/CoverScreen";
@@ -15,6 +16,7 @@ import {
   firstBattle,
   firstGift,
   gameBgm,
+  memoryIntroText,
   memories,
   sceneLabels,
   secondGift,
@@ -29,6 +31,7 @@ const flow: SceneId[] = [
   "collectHearts",
   "secondGift",
   "bossBattle",
+  "memoryIntro",
   "memories",
   "fakeEnding",
   "finalGift",
@@ -68,7 +71,7 @@ export default function App() {
 
   const goTo = (next: SceneId) => {
     if (next === scene) return;
-    if (next === "memories") {
+    if (next === "memoryIntro" || next === "memories") {
       pauseGameBgm();
       void playAlbumBgm(albumBgm.src);
     } else if (next === "cover") {
@@ -106,6 +109,13 @@ export default function App() {
       <BattleGame
         battle={bossBattle}
         variant="boss"
+        onContinue={() => goTo("memoryIntro")}
+      />
+    ),
+    memoryIntro: (
+      <AlbumIntro
+        text={memoryIntroText}
+        memories={memories}
         onContinue={() => goTo("memories")}
       />
     ),

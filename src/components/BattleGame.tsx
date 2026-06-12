@@ -44,12 +44,17 @@ const monsterSprites: Record<
   },
 };
 
+const playerMaxHp = 100;
+const bossCounterDamage = 18;
+
 export default function BattleGame({
   battle,
   variant,
   onContinue,
 }: BattleGameProps) {
   const [hp, setHp] = useState(battle.hp);
+  const [playerHp, setPlayerHp] = useState(playerMaxHp);
+  const [playerDamaged, setPlayerDamaged] = useState(false);
   const [hits, setHits] = useState<HitFx[]>([]);
   const [shakeKey, setShakeKey] = useState(0);
   const [impacting, setImpacting] = useState(false);
@@ -61,8 +66,13 @@ export default function BattleGame({
   const counterStartRef = useRef<number | undefined>(undefined);
   const counterEndRef = useRef<number | undefined>(undefined);
   const rewardReadyRef = useRef<number | undefined>(undefined);
+  const playerDamagedRef = useRef<number | undefined>(undefined);
 
   const hpPercent = Math.max(0, Math.round((hp / battle.hp) * 100));
+  const playerHpPercent = Math.max(
+    0,
+    Math.round((playerHp / playerMaxHp) * 100),
+  );
 
   const line = useMemo(() => {
     if (defeated) return battle.lines[battle.lines.length - 1];
@@ -81,6 +91,7 @@ export default function BattleGame({
       window.clearTimeout(counterStartRef.current);
       window.clearTimeout(counterEndRef.current);
       window.clearTimeout(rewardReadyRef.current);
+      window.clearTimeout(playerDamagedRef.current);
     };
   }, []);
 
@@ -92,6 +103,14 @@ export default function BattleGame({
       playCounterAttackSound(battle.id);
       navigator.vibrate?.(isFinalBoss ? [16, 24, 18] : [14, 18]);
       setCountering(true);
+      if (isFinalBoss) {
+        setPlayerDamaged(true);
+        setPlayerHp((current) => Math.max(8, current - bossCounterDamage));
+        window.clearTimeout(playerDamagedRef.current);
+        playerDamagedRef.current = window.setTimeout(() => {
+          setPlayerDamaged(false);
+        }, 520);
+      }
 
       counterEndRef.current = window.setTimeout(() => {
         setCountering(false);
@@ -138,7 +157,9 @@ export default function BattleGame({
       if (next === 0) {
         window.clearTimeout(counterStartRef.current);
         window.clearTimeout(counterEndRef.current);
+        window.clearTimeout(playerDamagedRef.current);
         setCountering(false);
+        setPlayerDamaged(false);
         setRewardReady(false);
         playBattleVictorySound(battle.id);
         window.setTimeout(() => {
@@ -174,6 +195,27 @@ export default function BattleGame({
         <div className="hp-bar" aria-label={`剩余血量 ${hpPercent}%`}>
           <span style={{ width: `${hpPercent}%` }} />
         </div>
+
+        {isFinalBoss && (
+          <div className={`player-hp-panel ${playerDamaged ? "is-damaged" : ""}`}>
+            <div className="hp-header">
+              <span>你的 HP</span>
+              <strong>
+                {playerHp}/{playerMaxHp}
+              </strong>
+            </div>
+            <div className="hp-bar player-hp-bar" aria-label={`你的剩余血量 ${playerHpPercent}%`}>
+              <span style={{ width: `${playerHpPercent}%` }} />
+            </div>
+            <p>
+              {playerHpPercent <= 35
+                ? "快撑住了，最后几下就能打开相册。"
+                : playerDamaged
+                  ? `Boss 反击命中，-${bossCounterDamage} HP`
+                  : "Boss 会反击，小心一点点。"}
+            </p>
+          </div>
+        )}
 
         <div className="speech-bubble">{line}</div>
 

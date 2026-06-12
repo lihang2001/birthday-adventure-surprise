@@ -114,7 +114,7 @@ button {
   top: 0;
   z-index: 5;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 6px;
   padding: 10px 0 14px;
   background: linear-gradient(
@@ -446,6 +446,48 @@ p {
   border-radius: inherit;
   background: linear-gradient(90deg, var(--pink-deep), var(--gold));
   transition: width 260ms ease;
+}
+
+.player-hp-panel {
+  margin-top: 14px;
+  border: 1px solid rgba(33, 27, 29, 0.12);
+  border-radius: 8px;
+  padding: 11px 12px 10px;
+  background:
+    linear-gradient(135deg, rgba(255, 252, 246, 0.88), rgba(247, 230, 232, 0.66)),
+    rgba(255, 252, 246, 0.78);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.player-hp-panel.is-damaged {
+  border-color: rgba(190, 63, 78, 0.42);
+  box-shadow: 0 0 0 4px rgba(190, 63, 78, 0.08);
+  animation: player-hp-hit 360ms ease;
+}
+
+.player-hp-panel p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.player-hp-bar span {
+  background: linear-gradient(90deg, #9fd6b2, #ead17b 72%, #e79ab1);
+}
+
+@keyframes player-hp-hit {
+  36% {
+    transform: translateX(-3px);
+  }
+
+  68% {
+    transform: translateX(3px);
+  }
 }
 
 .speech-bubble {
@@ -2876,6 +2918,150 @@ p {
   box-shadow: 0 16px 32px rgba(60, 38, 45, 0.14);
   text-align: center;
   animation: panel-up 360ms ease;
+}
+
+.album-intro-screen {
+  gap: 24px;
+}
+
+.album-intro-card {
+  position: relative;
+  display: grid;
+  width: min(100%, 360px);
+  gap: 18px;
+  justify-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 24px 18px 20px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(199, 169, 108, 0.18), transparent 30%),
+    linear-gradient(180deg, rgba(255, 252, 246, 0.9), rgba(248, 230, 235, 0.74)),
+    var(--cream);
+  box-shadow: var(--shadow);
+}
+
+.album-intro-card::before {
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(199, 169, 108, 0.22);
+  border-radius: 8px;
+  content: "";
+  pointer-events: none;
+}
+
+.album-lock {
+  position: relative;
+  display: grid;
+  width: 78px;
+  height: 86px;
+  place-items: end center;
+  filter: drop-shadow(0 14px 18px rgba(60, 38, 45, 0.14));
+}
+
+.album-lock-shackle {
+  position: absolute;
+  top: 2px;
+  width: 46px;
+  height: 44px;
+  border: 5px solid #2b2428;
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+  transform-origin: right bottom;
+  animation: album-unlock 1.9s cubic-bezier(0.18, 1.2, 0.24, 1) infinite;
+}
+
+.album-lock-body {
+  position: relative;
+  width: 62px;
+  height: 48px;
+  border: 1.5px solid rgba(33, 27, 29, 0.72);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 50% 48%, #fff8e6 0 4px, transparent 5px),
+    linear-gradient(135deg, #2b2428, #111012 62%, #c7a96c);
+}
+
+.album-lock-body::after {
+  position: absolute;
+  top: 27px;
+  left: 50%;
+  width: 3px;
+  height: 12px;
+  border-radius: 999px;
+  background: #fff8e6;
+  content: "";
+  transform: translateX(-50%);
+}
+
+@keyframes album-unlock {
+  0%,
+  42%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  62% {
+    transform: rotate(-18deg) translateX(-2px);
+  }
+}
+
+.album-preview-stack {
+  position: relative;
+  width: 236px;
+  height: 210px;
+}
+
+.album-preview-photo {
+  position: absolute;
+  width: 132px;
+  height: 170px;
+  object-fit: cover;
+  box-shadow: 0 16px 28px rgba(60, 38, 45, 0.16);
+}
+
+.album-preview-photo.photo-1 {
+  top: 22px;
+  left: 4px;
+  transform: rotate(-7deg);
+}
+
+.album-preview-photo.photo-2 {
+  top: 4px;
+  right: 6px;
+  transform: rotate(6deg);
+}
+
+.album-preview-photo.photo-3 {
+  right: 44px;
+  bottom: 0;
+  z-index: 2;
+  transform: rotate(-1deg);
+}
+
+.album-preview-photo.photo-4 {
+  bottom: 18px;
+  left: 42px;
+  transform: rotate(9deg);
+}
+
+.album-intro-copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+  text-align: center;
+}
+
+.album-intro-copy strong {
+  font-size: 1.05rem;
+}
+
+.album-intro-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
 }
 
 .memory-stage {
