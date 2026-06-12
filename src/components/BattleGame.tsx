@@ -4,6 +4,7 @@ import {
   playBattleHitSound,
   playBattleVictorySound,
   playCounterAttackSound,
+  playRewardFireworkSound,
   primeGameAudio,
 } from "../sound";
 import GiftBurst from "./GiftBurst";
@@ -55,9 +56,11 @@ export default function BattleGame({
   const [countering, setCountering] = useState(false);
   const [combo, setCombo] = useState(0);
   const [defeated, setDefeated] = useState(false);
+  const [rewardReady, setRewardReady] = useState(false);
   const comboTimerRef = useRef<number | undefined>(undefined);
   const counterStartRef = useRef<number | undefined>(undefined);
   const counterEndRef = useRef<number | undefined>(undefined);
+  const rewardReadyRef = useRef<number | undefined>(undefined);
 
   const hpPercent = Math.max(0, Math.round((hp / battle.hp) * 100));
 
@@ -77,6 +80,7 @@ export default function BattleGame({
       window.clearTimeout(comboTimerRef.current);
       window.clearTimeout(counterStartRef.current);
       window.clearTimeout(counterEndRef.current);
+      window.clearTimeout(rewardReadyRef.current);
     };
   }, []);
 
@@ -96,7 +100,7 @@ export default function BattleGame({
   };
 
   const attack = () => {
-    if (defeated) return;
+    if (defeated || hp <= 0) return;
 
     navigator.vibrate?.(isFinalBoss ? [28, 18, 32] : [20, 18, 26]);
     primeGameAudio();
@@ -135,8 +139,16 @@ export default function BattleGame({
         window.clearTimeout(counterStartRef.current);
         window.clearTimeout(counterEndRef.current);
         setCountering(false);
+        setRewardReady(false);
         playBattleVictorySound(battle.id);
-        window.setTimeout(() => setDefeated(true), 250);
+        window.setTimeout(() => {
+          playRewardFireworkSound(variant === "boss" ? "black" : "cream");
+          setDefeated(true);
+          window.clearTimeout(rewardReadyRef.current);
+          rewardReadyRef.current = window.setTimeout(() => {
+            setRewardReady(true);
+          }, 920);
+        }, 250);
       } else if (nextCombo % (isFinalBoss ? 3 : 4) === 0) {
         triggerCounter();
       }
@@ -308,7 +320,15 @@ export default function BattleGame({
       {defeated && (
         <div className="result-panel">
           <strong>{battle.defeatedText}</strong>
-          <button className="primary-button" type="button" onClick={onContinue}>
+          <p className="result-note">
+            {rewardReady ? "奖励已经稳稳落下啦。" : "小烟花正在庆祝，奖励马上落下。"}
+          </p>
+          <button
+            className="primary-button"
+            type="button"
+            onClick={onContinue}
+            disabled={!rewardReady}
+          >
             {battle.continueText}
           </button>
         </div>

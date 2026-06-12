@@ -27,6 +27,7 @@ type WebAudioWindow = Window &
 let audioContext: AudioContext | null = null;
 let masterGain: GainNode | null = null;
 let lastVictoryAt = 0;
+let lastRewardFireworkAt = 0;
 let albumAudio: HTMLAudioElement | null = null;
 let albumAudioSrc = "";
 let gameAudio: HTMLAudioElement | null = null;
@@ -354,6 +355,56 @@ export function playBattleVictorySound(id: BattleSoundId) {
     volume: 0.05,
     filterType: "highpass",
     frequency: 2200,
+  });
+}
+
+export function playRewardFireworkSound(variant: GiftSoundVariant = "cream") {
+  primeGameAudio();
+
+  const now = performance.now();
+  if (now - lastRewardFireworkAt < 420) return;
+  lastRewardFireworkAt = now;
+
+  playAsset("/audio/collect-good-2.ogg", {
+    volume: variant === "black" ? 0.56 : 0.7,
+    playbackRate: variant === "black" ? 0.98 : 1.18,
+  });
+  playAsset("/audio/collect-good-1.ogg", {
+    volume: variant === "black" ? 0.42 : 0.52,
+    playbackRate: variant === "black" ? 1.08 : 1.28,
+  });
+
+  const context = getAudioContext();
+  if (!context) return;
+
+  [0, 4, 7, 12, 16].forEach((step, index) => {
+    playTone(context, {
+      startFrequency: 523.25 * 2 ** (step / 12),
+      endFrequency: 659.25 * 2 ** (step / 12),
+      duration: 0.11,
+      delay: index * 0.055,
+      volume: variant === "black" ? 0.055 : 0.072,
+      type: "triangle",
+    });
+  });
+
+  [0.03, 0.14, 0.24].forEach((delay, index) => {
+    playNoise(context, {
+      duration: 0.1 + index * 0.035,
+      delay,
+      volume: variant === "black" ? 0.075 : 0.092,
+      filterType: "highpass",
+      frequency: 3200 + index * 900,
+    });
+  });
+
+  playTone(context, {
+    startFrequency: variant === "black" ? 196 : 262,
+    endFrequency: variant === "black" ? 98 : 132,
+    duration: 0.18,
+    delay: 0.02,
+    volume: variant === "black" ? 0.12 : 0.09,
+    type: "sine",
   });
 }
 

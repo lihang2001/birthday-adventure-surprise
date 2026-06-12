@@ -9,6 +9,7 @@ import type { CollectLevelText } from "../data";
 import {
   playCollectBadSound,
   playCollectGoodSound,
+  playRewardFireworkSound,
   primeGameAudio,
 } from "../sound";
 import GiftBurst from "./GiftBurst";
@@ -54,6 +55,7 @@ export default function CollectGame({ level, onContinue }: CollectGameProps) {
   const collectedRef = useRef(0);
   const livesRef = useRef(level.lives);
   const completeRef = useRef(false);
+  const rewardReadyRef = useRef<number | undefined>(undefined);
 
   const [player, setPlayerState] = useState<Point>({ x: 0, y: 0 });
   const [heart, setHeartState] = useState<Point>({ x: 0, y: 0 });
@@ -62,6 +64,7 @@ export default function CollectGame({ level, onContinue }: CollectGameProps) {
   const [lives, setLives] = useState(level.lives);
   const [message, setMessage] = useState(level.hint);
   const [complete, setComplete] = useState(false);
+  const [rewardReady, setRewardReady] = useState(false);
   const [hitPulse, setHitPulse] = useState(false);
   const currentAvatar =
     level.playerAvatars[collected % level.playerAvatars.length] ??
@@ -102,7 +105,10 @@ export default function CollectGame({ level, onContinue }: CollectGameProps) {
   useEffect(() => {
     initGame();
     window.addEventListener("resize", initGame);
-    return () => window.removeEventListener("resize", initGame);
+    return () => {
+      window.removeEventListener("resize", initGame);
+      window.clearTimeout(rewardReadyRef.current);
+    };
   }, [initGame]);
 
   useEffect(() => {
@@ -153,8 +159,14 @@ export default function CollectGame({ level, onContinue }: CollectGameProps) {
 
         if (nextCollected >= level.target) {
           completeRef.current = true;
+          setRewardReady(false);
+          playRewardFireworkSound("cream");
           setComplete(true);
           setMessage(level.completeText);
+          window.clearTimeout(rewardReadyRef.current);
+          rewardReadyRef.current = window.setTimeout(() => {
+            setRewardReady(true);
+          }, 920);
           return;
         }
 
@@ -312,7 +324,15 @@ export default function CollectGame({ level, onContinue }: CollectGameProps) {
           <div className="collect-complete">
             <GiftBurst label="奖励爆出来了" />
             <strong>{level.completeText}</strong>
-            <button className="primary-button" type="button" onClick={onContinue}>
+            <p className="result-note">
+              {rewardReady ? "第二份小礼物已经出现啦。" : "好运烟花正在散开，礼物马上落下。"}
+            </p>
+            <button
+              className="primary-button"
+              type="button"
+              onClick={onContinue}
+              disabled={!rewardReady}
+            >
               {level.continueText}
             </button>
           </div>

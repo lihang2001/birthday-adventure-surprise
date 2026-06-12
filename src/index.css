@@ -208,6 +208,13 @@ p {
   font-weight: 700;
 }
 
+.primary-button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+  transform: none;
+  box-shadow: 0 10px 18px rgba(33, 27, 29, 0.1);
+}
+
 .ghost-button {
   border-color: var(--line);
   background: rgba(255, 255, 255, 0.58);
@@ -1953,6 +1960,20 @@ p {
   }
 }
 
+@keyframes reward-firework-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.28);
+  }
+  18% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
 .gift-burst {
   position: relative;
   display: grid;
@@ -1962,6 +1983,32 @@ p {
   overflow: visible;
   isolation: isolate;
   animation: burst-arrive 580ms cubic-bezier(0.18, 1.22, 0.24, 1) both;
+}
+
+.gift-burst::before,
+.gift-burst::after {
+  position: absolute;
+  inset: 22px;
+  z-index: -1;
+  border: 1px solid rgba(199, 169, 108, 0.42);
+  border-radius: 50%;
+  content: "";
+  opacity: 0;
+  animation: reward-firework-ring 980ms ease-out both 80ms;
+}
+
+.gift-burst::after {
+  inset: 6px;
+  border-color: rgba(246, 203, 216, 0.44);
+  animation-delay: 180ms;
+}
+
+.gift-burst.black::before {
+  border-color: rgba(199, 169, 108, 0.5);
+}
+
+.gift-burst.black::after {
+  border-color: rgba(216, 200, 240, 0.42);
 }
 
 .gift-burst p {
@@ -2393,6 +2440,13 @@ p {
   padding: 16px;
   text-align: center;
   animation: panel-up 360ms ease;
+}
+
+.result-note {
+  margin: -4px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.6;
 }
 
 @keyframes panel-up {
@@ -3277,11 +3331,66 @@ p {
   gap: 10px;
 }
 
+.ending-main-frame {
+  position: relative;
+  display: grid;
+}
+
 .ending-main-photo {
   aspect-ratio: 4 / 5;
   box-shadow:
     0 18px 38px rgba(43, 34, 38, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.ending-photo-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(255, 250, 244, 0.72);
+  border-radius: 999px;
+  background: rgba(33, 27, 29, 0.48);
+  color: #fffaf4;
+  box-shadow: 0 10px 20px rgba(33, 27, 29, 0.18);
+  cursor: pointer;
+  font-size: 1.7rem;
+  line-height: 1;
+  transform: translateY(-50%);
+  backdrop-filter: blur(10px);
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.ending-photo-nav:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.ending-photo-prev {
+  left: 10px;
+}
+
+.ending-photo-next {
+  right: 10px;
+}
+
+.ending-photo-count {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+  border: 1px solid rgba(255, 250, 244, 0.62);
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(33, 27, 29, 0.46);
+  color: #fffaf4;
+  font-size: 0.72rem;
+  font-weight: 800;
+  backdrop-filter: blur(10px);
 }
 
 .ending-photo-strip {

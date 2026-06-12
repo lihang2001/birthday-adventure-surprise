@@ -13,6 +13,19 @@ export default function FakeEnding({ onContinue }: FakeEndingProps) {
     ? fakeEndingText.images
     : [fakeEndingText.cakeImage];
   const currentPhoto = endingPhotos[activePhoto] ?? endingPhotos[0];
+  const hasMultiplePhotos = endingPhotos.length > 1;
+
+  const previousPhoto = () => {
+    setActivePhoto((index) =>
+      index === 0 ? endingPhotos.length - 1 : index - 1,
+    );
+  };
+
+  const nextPhoto = () => {
+    setActivePhoto((index) =>
+      index === endingPhotos.length - 1 ? 0 : index + 1,
+    );
+  };
 
   return (
     <div className="screen fake-ending-screen">
@@ -22,12 +35,37 @@ export default function FakeEnding({ onContinue }: FakeEndingProps) {
       </div>
 
       <div className="ending-photo-set">
-        <PlaceholderImage
-          className="ending-main-photo"
-          src={currentPhoto.src}
-          alt={currentPhoto.alt}
-          label={currentPhoto.label}
-        />
+        <div className="ending-main-frame">
+          <PlaceholderImage
+            className="ending-main-photo"
+            src={currentPhoto.src}
+            alt={currentPhoto.alt}
+            label={currentPhoto.label}
+          />
+          {hasMultiplePhotos && (
+            <>
+              <button
+                className="ending-photo-nav ending-photo-prev"
+                type="button"
+                onClick={previousPhoto}
+                aria-label="上一张照片"
+              >
+                ‹
+              </button>
+              <button
+                className="ending-photo-nav ending-photo-next"
+                type="button"
+                onClick={nextPhoto}
+                aria-label="下一张照片"
+              >
+                ›
+              </button>
+              <span className="ending-photo-count">
+                {activePhoto + 1}/{endingPhotos.length}
+              </span>
+            </>
+          )}
+        </div>
 
         <div className="ending-photo-strip" aria-label="最后一页照片集">
           {endingPhotos.map((photo, index) => (

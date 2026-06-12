@@ -105,7 +105,7 @@ export const firstBattle: BattleText = {
   subtitle: "它守着第一份小礼物，轻轻点它就好。",
   hpLabel: "小 Boss HP",
   attackLabel: "攻击紫色独眼小 Boss",
-  hp: 100,
+  hp: 120,
   damage: 10,
   lines: [
     "就这点力气呀？",
@@ -143,7 +143,7 @@ export const firstGift: GiftReward = {
 export const collectLevel: CollectLevelText = {
   eyebrow: "Level 02",
   title: "第二关：躲开坏东西并收集好运",
-  subtitle: "拖动小角色移动，收集 10 件好运的事情就能解锁相册。",
+  subtitle: "拖动小角色移动，收集 12 件好运的事情就能解锁相册。",
   hint: "慢慢来，避开霉运和坏情绪，看到好运就靠近它。",
   lifeLabel: "生命值",
   collectedLabel: "好运",
@@ -178,7 +178,7 @@ export const collectLevel: CollectLevelText = {
     "好运",
   ],
   badItems: ["霉运", "烦恼", "焦虑", "内耗", "坏情绪", "小倒霉"],
-  target: 10,
+  target: 12,
   lives: 3,
   completeText: "收集完成，掉出第二份小礼物。",
   continueText: "查看第二份礼物",
@@ -287,6 +287,12 @@ export const memories: Memory[] = [
         src: "/photos/memory-weihai-16.jpg",
         alt: "5.30 镜子前的合照",
         label: "图 5",
+      },
+      {
+        src: "/videos/memory-0530-extra.mp4",
+        alt: "5.30 的小视频",
+        label: "视频",
+        type: "video",
       },
     ],
     diary: `去公园拍照了
@@ -404,7 +410,7 @@ export const bossBattle: BattleText = {
   subtitle: "它挡在回忆相册前面，这次要认真打。",
   hpLabel: "魔王 HP",
   attackLabel: "攻击贱眼魔王",
-  hp: 200,
+  hp: 260,
   damage: 20,
   lines: [
     "最后一关了，敢不敢打重点？",
