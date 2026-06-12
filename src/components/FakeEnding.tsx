@@ -8,6 +8,11 @@ interface FakeEndingProps {
 
 export default function FakeEnding({ onContinue }: FakeEndingProps) {
   const [open, setOpen] = useState(false);
+  const [activePhoto, setActivePhoto] = useState(0);
+  const endingPhotos = fakeEndingText.images.length
+    ? fakeEndingText.images
+    : [fakeEndingText.cakeImage];
+  const currentPhoto = endingPhotos[activePhoto] ?? endingPhotos[0];
 
   return (
     <div className="screen fake-ending-screen">
@@ -16,12 +21,33 @@ export default function FakeEnding({ onContinue }: FakeEndingProps) {
         <h1>{fakeEndingText.title}</h1>
       </div>
 
-      <PlaceholderImage
-        className="cake-preview"
-        src={fakeEndingText.cakeImage.src}
-        alt={fakeEndingText.cakeImage.alt}
-        label={fakeEndingText.cakeImage.label}
-      />
+      <div className="ending-photo-set">
+        <PlaceholderImage
+          className="ending-main-photo"
+          src={currentPhoto.src}
+          alt={currentPhoto.alt}
+          label={currentPhoto.label}
+        />
+
+        <div className="ending-photo-strip" aria-label="最后一页照片集">
+          {endingPhotos.map((photo, index) => (
+            <button
+              className={`ending-thumb-button ${index === activePhoto ? "is-active" : ""}`}
+              key={photo.src}
+              type="button"
+              onClick={() => setActivePhoto(index)}
+              aria-label={`查看照片 ${index + 1}`}
+            >
+              <PlaceholderImage
+                className="ending-thumb-photo"
+                src={photo.src}
+                alt={photo.alt}
+                label={`${index + 1}`}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="ending-copy">
         <h2>{fakeEndingText.birthday}</h2>

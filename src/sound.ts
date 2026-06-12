@@ -1,10 +1,14 @@
 type BattleSoundId = "first" | "boss";
+type GiftSoundVariant = "cream" | "black";
+type MediaPlayResult = "playing" | "blocked" | "missing";
 
 const punchSounds = [
   "/audio/punch-heavy-1.ogg",
   "/audio/punch-heavy-2.ogg",
   "/audio/punch-medium-1.ogg",
 ];
+
+const heavyPunchSounds = ["/audio/punch-heavy-1.ogg", "/audio/punch-heavy-2.ogg"];
 
 const metalSounds = [
   "/audio/metal-heavy-1.ogg",
@@ -23,6 +27,8 @@ type WebAudioWindow = Window &
 let audioContext: AudioContext | null = null;
 let masterGain: GainNode | null = null;
 let lastVictoryAt = 0;
+let albumAudio: HTMLAudioElement | null = null;
+let albumAudioSrc = "";
 const audioCache = new Map<string, HTMLAudioElement>();
 
 function getAudioContext() {
@@ -190,6 +196,37 @@ function playPunch(context: AudioContext, intensity = 1) {
   });
 }
 
+function playHeavyPunch(context: AudioContext) {
+  playTone(context, {
+    startFrequency: 72,
+    endFrequency: 24,
+    duration: 0.22,
+    volume: 0.74,
+    type: "sine",
+  });
+  playTone(context, {
+    startFrequency: 132,
+    endFrequency: 42,
+    duration: 0.1,
+    delay: 0.006,
+    volume: 0.3,
+    type: "square",
+  });
+  playNoise(context, {
+    duration: 0.06,
+    volume: 0.48,
+    filterType: "lowpass",
+    frequency: 720,
+  });
+  playNoise(context, {
+    duration: 0.035,
+    delay: 0.018,
+    volume: 0.16,
+    filterType: "highpass",
+    frequency: 1900,
+  });
+}
+
 function playMagic(context: AudioContext) {
   playTone(context, {
     startFrequency: 580,
@@ -248,11 +285,15 @@ export function playBattleHitSound(id: BattleSoundId) {
   const context = getAudioContext();
 
   if (id === "first") {
-    playAsset(randomItem(punchSounds), {
-      volume: 0.92,
-      playbackRate: 0.94 + Math.random() * 0.1,
+    playAsset(randomItem(heavyPunchSounds), {
+      volume: 1,
+      playbackRate: 0.78 + Math.random() * 0.08,
     });
-    if (context) playPunch(context, 0.95);
+    playAsset(randomItem(heavyPunchSounds), {
+      volume: 0.46,
+      playbackRate: 0.62 + Math.random() * 0.06,
+    });
+    if (context) playHeavyPunch(context);
     return;
   }
 
@@ -314,6 +355,88 @@ export function playBattleVictorySound(id: BattleSoundId) {
   });
 }
 
+export function playCounterAttackSound(id: BattleSoundId) {
+  primeGameAudio();
+
+  const context = getAudioContext();
+
+  if (id === "first") {
+    playAsset("/audio/punch-heavy-2.ogg", {
+      volume: 0.62,
+      playbackRate: 0.76,
+    });
+
+    if (!context) return;
+    playTone(context, {
+      startFrequency: 168,
+      endFrequency: 72,
+      duration: 0.13,
+      volume: 0.18,
+      type: "square",
+    });
+    playNoise(context, {
+      duration: 0.07,
+      delay: 0.015,
+      volume: 0.16,
+      filterType: "lowpass",
+      frequency: 980,
+    });
+    return;
+  }
+
+  playAsset("/audio/metal-heavy-1.ogg", {
+    volume: 0.72,
+    playbackRate: 0.92,
+  });
+
+  if (!context) return;
+  playMagic(context);
+  playSword(context);
+}
+
+export function playGiftOpenSound(variant: GiftSoundVariant = "cream") {
+  primeGameAudio();
+
+  playAsset("/audio/collect-good-2.ogg", {
+    volume: variant === "black" ? 0.76 : 0.84,
+    playbackRate: variant === "black" ? 0.92 : 1.08,
+  });
+
+  const context = getAudioContext();
+  if (!context) return;
+
+  playTone(context, {
+    startFrequency: variant === "black" ? 196 : 246,
+    endFrequency: variant === "black" ? 84 : 132,
+    duration: 0.14,
+    volume: variant === "black" ? 0.2 : 0.14,
+    type: "sine",
+  });
+  playTone(context, {
+    startFrequency: 740,
+    endFrequency: 1480,
+    duration: 0.18,
+    delay: 0.025,
+    volume: 0.11,
+    type: "triangle",
+  });
+  playTone(context, {
+    startFrequency: 988,
+    endFrequency: 1760,
+    duration: 0.16,
+    delay: 0.085,
+    volume: 0.08,
+    type: "sine",
+  });
+  playNoise(context, {
+    duration: 0.12,
+    delay: 0.025,
+    volume: 0.08,
+    filterType: "highpass",
+    frequency: 2600,
+  });
+}
+
 export function playCollectGoodSound() {
   primeGameAudio();
   playAsset(randomItem(collectGoodSounds), {
@@ -348,4 +471,38 @@ export function playCollectBadSound() {
     volume: 0.12,
     type: "sawtooth",
   });
+}
+
+function getAlbumAudio(src: string) {
+  if (!albumAudio || albumAudioSrc !== src) {
+    albumAudio?.pause();
+    albumAudio = new Audio(src);
+    albumAudio.preload = "auto";
+    albumAudio.loop = true;
+    albumAudio.volume = 0.38;
+    albumAudioSrc = src;
+  }
+
+  return albumAudio;
+}
+
+export async function playAlbumBgm(src: string): Promise<MediaPlayResult> {
+  const audio = getAlbumAudio(src);
+  audio.loop = true;
+  audio.volume = 0.38;
+
+  try {
+    await audio.play();
+    return "playing";
+  } catch {
+    return audio.error ? "missing" : "blocked";
+  }
+}
+
+export function pauseAlbumBgm() {
+  albumAudio?.pause();
+}
+
+export function isAlbumBgmPlaying() {
+  return Boolean(albumAudio && !albumAudio.paused);
 }

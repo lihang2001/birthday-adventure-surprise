@@ -632,6 +632,10 @@ p {
   animation: boss-counter-stance 640ms cubic-bezier(0.18, 1.1, 0.24, 1) both;
 }
 
+.battle-id-first .monster-button.small.is-countering {
+  animation: slime-counter-stance 540ms cubic-bezier(0.18, 1.05, 0.22, 1) both;
+}
+
 .battle-id-first .monster-button.small {
   animation:
     boss-sprite-hit 300ms cubic-bezier(0.16, 1.25, 0.26, 1),
@@ -745,6 +749,24 @@ p {
   }
   68% {
     transform: translateX(8px) translateY(-4px) rotate(1.4deg) scale(1.02);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slime-counter-stance {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  24% {
+    filter: brightness(1.18) saturate(1.2);
+    transform: translateX(-10px) translateY(-5px) rotate(-2deg) scaleX(1.08)
+      scaleY(0.95);
+  }
+  62% {
+    transform: translateX(9px) translateY(-2px) rotate(1.5deg) scaleX(0.98)
+      scaleY(1.04);
   }
   100% {
     transform: translateY(0) scale(1);
@@ -865,6 +887,53 @@ p {
   top: 34%;
   left: 72%;
   animation-delay: 190ms;
+}
+
+.boss-counter-effect.counter-first::before {
+  inset: 27% 9% 24%;
+  background:
+    radial-gradient(circle at 44% 48%, rgba(255, 255, 255, 0.48), transparent 8%),
+    radial-gradient(circle at 45% 48%, rgba(205, 84, 255, 0.34), transparent 28%),
+    radial-gradient(circle at 50% 50%, transparent 54%, rgba(255, 255, 255, 0.34) 55%, transparent 62%);
+}
+
+.counter-first .counter-orb {
+  top: 47%;
+  left: 39%;
+  width: 34px;
+  height: 34px;
+}
+
+.counter-first .counter-beam {
+  top: 47%;
+  left: 43%;
+  width: min(56vw, 184px);
+  height: 34px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(241, 159, 255, 0.78) 28%, rgba(137, 43, 216, 0.62) 70%, transparent 100%);
+}
+
+.counter-first .counter-spark.s1 {
+  top: 32%;
+  left: 32%;
+}
+
+.counter-first .counter-spark.s2 {
+  top: 62%;
+  left: 38%;
+}
+
+.counter-first .counter-spark.s3 {
+  top: 38%;
+  left: 69%;
+}
+
+.boss-counter-effect.counter-boss {
+  transform: translateX(18px);
+}
+
+.counter-boss .counter-beam {
+  width: min(68vw, 252px);
 }
 
 @keyframes counter-flash {
@@ -1011,6 +1080,16 @@ p {
   transform: translateY(11px) scale(1.02);
 }
 
+.boss-attack {
+  --attack-x: 0px;
+  --attack-y: 0px;
+  --attack-scale: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(var(--attack-x)) translateY(var(--attack-y))
+    scale(var(--attack-scale));
+}
+
 .battle-id-first .boss-sprite {
   width: 210px;
 }
@@ -1018,6 +1097,12 @@ p {
 .battle-id-first .boss-hurt {
   width: 198px;
   transform: translateY(10px) scale(1.02);
+}
+
+.battle-id-first .boss-attack {
+  --attack-x: 56px;
+  --attack-y: -3px;
+  width: min(92vw, 330px);
 }
 
 .battle-id-boss .boss-sprite {
@@ -1028,6 +1113,17 @@ p {
   width: min(86vw, 324px);
   transform-origin: 52% 84%;
   transform: translateY(5px) scale(1.03);
+}
+
+.battle-id-boss .boss-attack {
+  --attack-x: 78px;
+  --attack-y: 18px;
+  --attack-scale: 1.02;
+  width: min(108vw, 450px);
+  filter:
+    saturate(1.13)
+    contrast(1.06)
+    drop-shadow(0 24px 18px rgba(16, 7, 27, 0.28));
 }
 
 .battle-card.is-impacting .boss-idle {
@@ -1060,6 +1156,47 @@ p {
     contrast(1.08)
     drop-shadow(0 28px 20px rgba(16, 7, 27, 0.3));
   animation: boss-hurt-lean-back 260ms cubic-bezier(0.16, 1.1, 0.28, 1) both;
+}
+
+.monster-button.is-countering .boss-idle,
+.monster-button.is-countering .boss-hurt {
+  opacity: 0 !important;
+}
+
+.monster-button.is-countering .boss-attack {
+  opacity: 1;
+  animation: boss-attack-frame 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.battle-id-first .monster-button.is-countering .boss-attack {
+  animation-duration: 500ms;
+}
+
+@keyframes boss-attack-frame {
+  0% {
+    opacity: 0;
+    transform: translateX(calc(var(--attack-x) - 20px))
+      translateY(calc(var(--attack-y) + 7px)) scale(0.94);
+  }
+
+  20% {
+    opacity: 1;
+    filter: brightness(1.18) saturate(1.24);
+    transform: translateX(var(--attack-x)) translateY(var(--attack-y))
+      scale(var(--attack-scale));
+  }
+
+  64% {
+    opacity: 1;
+    transform: translateX(var(--attack-x)) translateY(var(--attack-y))
+      scale(var(--attack-scale));
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(calc(var(--attack-x) + 8px))
+      translateY(var(--attack-y)) scale(var(--attack-scale));
+  }
 }
 
 @keyframes boss-hurt-lean-back {
@@ -2325,7 +2462,9 @@ p {
 .memory-photo,
 .modal-photo,
 .final-gift-image,
-.cake-preview {
+.cake-preview,
+.ending-main-photo,
+.ending-thumb-photo {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fffaf4;
@@ -2847,6 +2986,33 @@ p {
   overflow: hidden;
 }
 
+.memory-video-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #151015;
+}
+
+.memory-video-wrap:not(.is-modal) video {
+  pointer-events: none;
+}
+
+.memory-video-badge {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 1;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  background: rgba(25, 20, 23, 0.68);
+  color: #fff8ef;
+  font-size: 0.7rem;
+  font-weight: 800;
+  backdrop-filter: blur(8px);
+}
+
 .memory-photo {
   width: 100%;
   height: 100%;
@@ -2990,6 +3156,11 @@ p {
   background: #151015;
 }
 
+.modal-photo-frame .memory-video-wrap {
+  height: auto;
+  border-radius: 8px 8px 0 0;
+}
+
 .modal-photo {
   max-height: 62vh;
   aspect-ratio: auto;
@@ -3070,6 +3241,61 @@ p {
   width: min(100%, 330px);
 }
 
+.ending-photo-set {
+  display: grid;
+  width: min(100%, 360px);
+  gap: 10px;
+}
+
+.ending-main-photo {
+  aspect-ratio: 4 / 5;
+  box-shadow:
+    0 18px 38px rgba(43, 34, 38, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.ending-photo-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  scroll-snap-type: x mandatory;
+}
+
+.ending-photo-strip::-webkit-scrollbar {
+  height: 0;
+}
+
+.ending-thumb-button {
+  display: block;
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  padding: 2px;
+  border: 1px solid rgba(47, 38, 41, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 252, 246, 0.76);
+  box-shadow: 0 8px 18px rgba(43, 34, 38, 0.08);
+  scroll-snap-align: center;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.ending-thumb-button.is-active {
+  border-color: rgba(191, 145, 72, 0.78);
+  box-shadow:
+    0 10px 22px rgba(191, 145, 72, 0.18),
+    0 0 0 2px rgba(255, 246, 219, 0.96);
+  transform: translateY(-2px);
+}
+
+.ending-thumb-photo {
+  height: 100%;
+  border-radius: 6px;
+}
+
 .ending-copy {
   padding: 18px;
   text-align: center;
@@ -3108,6 +3334,63 @@ p {
   background:
     radial-gradient(circle at 35% 24%, rgba(255, 255, 255, 0.72), transparent 23%),
     linear-gradient(135deg, #eed088, #b78942);
+}
+
+.secret-prize-button {
+  position: absolute;
+  top: 84px;
+  right: 0;
+  z-index: 4;
+  display: grid;
+  width: 96px;
+  min-height: 62px;
+  place-items: center;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid rgba(191, 145, 72, 0.72);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 24% 18%, rgba(255, 255, 255, 0.92), transparent 24%),
+    linear-gradient(145deg, #2f272b, #080708 62%, #bf9148);
+  color: #fff8e9;
+  box-shadow:
+    0 16px 28px rgba(43, 34, 38, 0.18),
+    0 0 0 4px rgba(255, 246, 219, 0.72);
+  font-weight: 900;
+  text-align: center;
+  animation: secret-prize-float 2.4s ease-in-out infinite;
+}
+
+.secret-prize-button span {
+  font-size: 0.88rem;
+}
+
+.secret-prize-button small {
+  color: #f1d694;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.secret-prize-modal strong {
+  color: var(--gold);
+  font-size: 1.15rem;
+}
+
+.secret-prize-modal p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+@keyframes secret-prize-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+
+  50% {
+    transform: translateY(-5px) rotate(2deg);
+  }
 }
 
 .final-content {
@@ -3158,7 +3441,8 @@ p {
   .result-panel,
   .collect-arena,
   .blessing-card,
-  .ending-copy {
+  .ending-copy,
+  .ending-photo-set {
     width: min(100%, 430px);
   }
 

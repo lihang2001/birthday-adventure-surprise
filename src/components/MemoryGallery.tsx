@@ -1,10 +1,47 @@
-import { useEffect, useRef, useState } from "react";
-import { albumBgm, memoryPageText, type Memory } from "../data";
+import { useEffect, useState } from "react";
+import { albumBgm, memoryPageText, type GiftImage, type Memory } from "../data";
+import { isAlbumBgmPlaying, pauseAlbumBgm, playAlbumBgm } from "../sound";
 import PlaceholderImage from "./PlaceholderImage";
 
 interface MemoryGalleryProps {
   memories: Memory[];
   onContinue: () => void;
+}
+
+interface MemoryMediaProps {
+  item: GiftImage;
+  className: string;
+  modal?: boolean;
+}
+
+function MemoryMedia({ item, className, modal = false }: MemoryMediaProps) {
+  if (item.type === "video") {
+    return (
+      <span className={`memory-video-wrap ${modal ? "is-modal" : ""}`}>
+        <video
+          className={`soft-image ${className}`}
+          src={item.src}
+          aria-label={item.alt}
+          controls={modal}
+          muted={!modal}
+          loop={!modal}
+          playsInline
+          preload="metadata"
+          autoPlay={!modal}
+        />
+        {!modal && <span className="memory-video-badge">视频</span>}
+      </span>
+    );
+  }
+
+  return (
+    <PlaceholderImage
+      className={className}
+      src={item.src}
+      alt={item.alt}
+      label={item.label}
+    />
+  );
 }
 
 export default function MemoryGallery({
@@ -13,48 +50,61 @@ export default function MemoryGallery({
 }: MemoryGalleryProps) {
   const [active, setActive] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedPhoto, setSelectedPhoto] = useState(0);
+  const [selectedMedia, setSelectedMedia] = useState(0);
   const [dragStart, setDragStart] = useState<number | null>(null);
   const [bgmState, setBgmState] = useState<"idle" | "playing" | "missing">(
     "idle",
   );
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const current = memories[active];
-  const currentPhotos = current.images;
-  const currentPhoto = currentPhotos[selectedPhoto] ?? currentPhotos[0];
-  const previewPhotos = currentPhotos.slice(0, 4);
-  const hiddenPhotoCount = Math.max(currentPhotos.length - previewPhotos.length, 0);
+  const currentMedia = current.images;
+  const selectedItem = currentMedia[selectedMedia] ?? currentMedia[0];
+  const previewMedia = currentMedia.slice(0, 4);
+  const hiddenMediaCount = Math.max(currentMedia.length - previewMedia.length, 0);
 
   useEffect(() => {
+    let mounted = true;
+
+    setBgmState(isAlbumBgmPlaying() ? "playing" : "idle");
+    void playAlbumBgm(albumBgm.src).then((result) => {
+      if (!mounted) return;
+      if (result === "playing") {
+        setBgmState("playing");
+      } else if (result === "missing") {
+        setBgmState("missing");
+      } else {
+        setBgmState("idle");
+      }
+    });
+
     return () => {
-      audioRef.current?.pause();
+      mounted = false;
+      pauseAlbumBgm();
     };
   }, []);
 
   const toggleBgm = async () => {
-    const audio = audioRef.current;
-    if (!audio || bgmState === "missing") return;
+    if (bgmState === "missing") return;
 
     if (bgmState === "playing") {
-      audio.pause();
+      pauseAlbumBgm();
       setBgmState("idle");
       return;
     }
 
-    try {
-      audio.volume = 0.38;
-      audio.loop = true;
-      await audio.play();
+    const result = await playAlbumBgm(albumBgm.src);
+    if (result === "playing") {
       setBgmState("playing");
-    } catch {
+    } else if (result === "missing") {
+      setBgmState("missing");
+    } else {
       setBgmState("idle");
     }
   };
 
   const goToMemory = (index: number) => {
     setActive(index);
-    setSelectedPhoto(0);
+    setSelectedMedia(0);
   };
 
   const prev = () => {
@@ -65,21 +115,21 @@ export default function MemoryGallery({
     goToMemory(active === memories.length - 1 ? 0 : active + 1);
   };
 
-  const openPhoto = (index: number) => {
-    if (!currentPhotos.length) return;
-    setSelectedPhoto(index);
+  const openMedia = (index: number) => {
+    if (!currentMedia.length) return;
+    setSelectedMedia(index);
     setModalOpen(true);
   };
 
-  const prevPhoto = () => {
-    setSelectedPhoto((index) =>
-      index === 0 ? currentPhotos.length - 1 : index - 1,
+  const prevMedia = () => {
+    setSelectedMedia((index) =>
+      index === 0 ? currentMedia.length - 1 : index - 1,
     );
   };
 
-  const nextPhoto = () => {
-    setSelectedPhoto((index) =>
-      index === currentPhotos.length - 1 ? 0 : index + 1,
+  const nextMedia = () => {
+    setSelectedMedia((index) =>
+      index === currentMedia.length - 1 ? 0 : index + 1,
     );
   };
 
@@ -101,13 +151,6 @@ export default function MemoryGallery({
       </div>
 
       <div className={`memory-bgm ${bgmState === "playing" ? "is-playing" : ""}`}>
-        <audio
-          ref={audioRef}
-          src={albumBgm.src}
-          preload="none"
-          loop
-          onError={() => setBgmState("missing")}
-        />
         <button
           type="button"
           onClick={toggleBgm}
@@ -144,7 +187,7 @@ export default function MemoryGallery({
 
         <article
           className={`memory-card ${
-            currentPhotos.length ? "" : "memory-card-text-only"
+            currentMedia.length ? "" : "memory-card-text-only"
           }`}
           onPointerDown={(event) => setDragStart(event.clientX)}
           onPointerUp={(event) => endSwipe(event.clientX)}
@@ -152,26 +195,21 @@ export default function MemoryGallery({
         >
           <div
             className={`memory-photo-grid photo-count-${Math.min(
-              currentPhotos.length,
+              currentMedia.length,
               4,
             )}`}
           >
-            {previewPhotos.length ? (
-              previewPhotos.map((photo, index) => (
+            {previewMedia.length ? (
+              previewMedia.map((item, index) => (
                 <button
                   className="memory-photo-button"
-                  key={photo.src}
+                  key={item.src}
                   type="button"
-                  onClick={() => openPhoto(index)}
+                  onClick={() => openMedia(index)}
                 >
-                  <PlaceholderImage
-                    className="memory-photo"
-                    src={photo.src}
-                    alt={photo.alt}
-                    label={photo.label}
-                  />
-                  {index === previewPhotos.length - 1 && hiddenPhotoCount > 0 && (
-                    <span className="memory-more">+{hiddenPhotoCount}</span>
+                  <MemoryMedia item={item} className="memory-photo" />
+                  {index === previewMedia.length - 1 && hiddenMediaCount > 0 && (
+                    <span className="memory-more">+{hiddenMediaCount}</span>
                   )}
                 </button>
               ))
@@ -215,7 +253,7 @@ export default function MemoryGallery({
         {memoryPageText.continueText}
       </button>
 
-      {modalOpen && currentPhoto && (
+      {modalOpen && selectedItem && (
         <div className="modal-backdrop" role="dialog" aria-modal="true">
           <div className="memory-modal">
             <button
@@ -227,49 +265,39 @@ export default function MemoryGallery({
               ×
             </button>
             <div className="modal-photo-frame">
-              {currentPhotos.length > 1 && (
+              {currentMedia.length > 1 && (
                 <button
                   className="modal-photo-nav modal-photo-prev"
                   type="button"
-                  onClick={prevPhoto}
+                  onClick={prevMedia}
                   aria-label="上一张照片"
                 >
                   ‹
                 </button>
               )}
-              <PlaceholderImage
-                className="modal-photo"
-                src={currentPhoto.src}
-                alt={currentPhoto.alt}
-                label={currentPhoto.label}
-              />
-              {currentPhotos.length > 1 && (
+              <MemoryMedia item={selectedItem} className="modal-photo" modal />
+              {currentMedia.length > 1 && (
                 <button
                   className="modal-photo-nav modal-photo-next"
                   type="button"
-                  onClick={nextPhoto}
+                  onClick={nextMedia}
                   aria-label="下一张照片"
                 >
                   ›
                 </button>
               )}
             </div>
-            {currentPhotos.length > 1 && (
+            {currentMedia.length > 1 && (
               <div className="memory-thumbs" aria-label="同一天的照片">
-                {currentPhotos.map((photo, index) => (
+                {currentMedia.map((item, index) => (
                   <button
-                    className={index === selectedPhoto ? "is-active" : ""}
-                    key={photo.src}
+                    className={index === selectedMedia ? "is-active" : ""}
+                    key={item.src}
                     type="button"
-                    onClick={() => setSelectedPhoto(index)}
-                    aria-label={`查看 ${photo.label}`}
+                    onClick={() => setSelectedMedia(index)}
+                    aria-label={`查看 ${item.label}`}
                   >
-                    <PlaceholderImage
-                      className="memory-thumb"
-                      src={photo.src}
-                      alt={photo.alt}
-                      label={photo.label}
-                    />
+                    <MemoryMedia item={item} className="memory-thumb" />
                   </button>
                 ))}
               </div>

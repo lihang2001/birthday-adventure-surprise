@@ -1,8 +1,9 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { BattleText } from "../data";
 import {
   playBattleHitSound,
   playBattleVictorySound,
+  playCounterAttackSound,
   primeGameAudio,
 } from "../sound";
 import GiftBurst from "./GiftBurst";
@@ -26,16 +27,18 @@ interface HitFx {
 
 const monsterSprites: Record<
   BattleText["id"],
-  { idle: string; hurt: string; alt: string }
+  { idle: string; hurt: string; attack: string; alt: string }
 > = {
   first: {
     idle: "/monsters/first-slime-idle.png",
     hurt: "/monsters/first-slime-hurt.png",
+    attack: "/monsters/first-slime-attack.png",
     alt: "紫色独眼小史莱姆",
   },
   boss: {
     idle: "/monsters/final-eye-king-idle.png",
     hurt: "/monsters/final-eye-king-hurt.png",
+    attack: "/monsters/final-eye-king-attack.png",
     alt: "贱眼魔王",
   },
 };
@@ -49,9 +52,12 @@ export default function BattleGame({
   const [hits, setHits] = useState<HitFx[]>([]);
   const [shakeKey, setShakeKey] = useState(0);
   const [impacting, setImpacting] = useState(false);
+  const [countering, setCountering] = useState(false);
   const [combo, setCombo] = useState(0);
   const [defeated, setDefeated] = useState(false);
   const comboTimerRef = useRef<number | undefined>(undefined);
+  const counterStartRef = useRef<number | undefined>(undefined);
+  const counterEndRef = useRef<number | undefined>(undefined);
 
   const hpPercent = Math.max(0, Math.round((hp / battle.hp) * 100));
 
@@ -66,6 +72,29 @@ export default function BattleGame({
   const sprite = monsterSprites[battle.id];
   const isFinalBoss = battle.id === "boss";
 
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(comboTimerRef.current);
+      window.clearTimeout(counterStartRef.current);
+      window.clearTimeout(counterEndRef.current);
+    };
+  }, []);
+
+  const triggerCounter = () => {
+    window.clearTimeout(counterStartRef.current);
+    window.clearTimeout(counterEndRef.current);
+
+    counterStartRef.current = window.setTimeout(() => {
+      playCounterAttackSound(battle.id);
+      navigator.vibrate?.(isFinalBoss ? [16, 24, 18] : [14, 18]);
+      setCountering(true);
+
+      counterEndRef.current = window.setTimeout(() => {
+        setCountering(false);
+      }, isFinalBoss ? 620 : 520);
+    }, isFinalBoss ? 180 : 150);
+  };
+
   const attack = () => {
     if (defeated) return;
 
@@ -77,7 +106,8 @@ export default function BattleGame({
     setImpacting(false);
     window.requestAnimationFrame(() => setImpacting(true));
     window.setTimeout(() => setImpacting(false), impactDuration);
-    setCombo((value) => value + 1);
+    const nextCombo = combo + 1;
+    setCombo(nextCombo);
     window.clearTimeout(comboTimerRef.current);
     comboTimerRef.current = window.setTimeout(() => setCombo(0), 900);
     setShakeKey((key) => key + 1);
@@ -102,8 +132,13 @@ export default function BattleGame({
     setHp((current) => {
       const next = Math.max(0, current - battle.damage);
       if (next === 0) {
+        window.clearTimeout(counterStartRef.current);
+        window.clearTimeout(counterEndRef.current);
+        setCountering(false);
         playBattleVictorySound(battle.id);
         window.setTimeout(() => setDefeated(true), 250);
+      } else if (nextCombo % (isFinalBoss ? 3 : 4) === 0) {
+        triggerCounter();
       }
       return next;
     });
@@ -136,7 +171,9 @@ export default function BattleGame({
             <button
               className={`monster-button ${variant} ${
                 battle.id === "first" ? "slime-boss" : "eye-king"
-              } mood-${hpPercent <= 35 ? "panic" : "calm"}`}
+              } mood-${hpPercent <= 35 ? "panic" : "calm"} ${
+                countering ? "is-countering" : ""
+              }`}
               key={shakeKey}
               type="button"
               onClick={attack}
@@ -156,8 +193,27 @@ export default function BattleGame({
                   alt=""
                   draggable={false}
                 />
+                <img
+                  className="boss-sprite boss-attack"
+                  src={sprite.attack}
+                  alt=""
+                  draggable={false}
+                />
               </span>
             </button>
+          )}
+
+          {countering && !defeated && (
+            <span
+              className={`boss-counter-effect counter-${battle.id}`}
+              aria-hidden="true"
+            >
+              <span className="counter-orb" />
+              <span className="counter-beam" />
+              <span className="counter-spark s1" />
+              <span className="counter-spark s2" />
+              <span className="counter-spark s3" />
+            </span>
           )}
 
           {hits.map((hit) => (

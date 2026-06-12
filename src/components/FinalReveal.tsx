@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { FinalGiftText } from "../data";
+import { playGiftOpenSound } from "../sound";
 import PlaceholderImage from "./PlaceholderImage";
 
 interface FinalRevealProps {
@@ -8,69 +9,75 @@ interface FinalRevealProps {
 }
 
 export default function FinalReveal({ text, onRestart }: FinalRevealProps) {
-  const [opened, setOpened] = useState(false);
+  const [secretOpen, setSecretOpen] = useState(false);
+  const openSecret = () => {
+    if (!secretOpen) {
+      playGiftOpenSound("black");
+    }
+    setSecretOpen(true);
+  };
 
   return (
     <div className="screen final-screen">
       <div className="title-block compact">
-        <p className="eyebrow">Final Gift</p>
-        <h1>{opened ? text.titleAfterOpen : text.titleBeforeOpen}</h1>
-        <p>{opened ? text.item : text.openHint}</p>
+        <p className="eyebrow">{text.eyebrow}</p>
+        <h1>{text.title}</h1>
+        <p>{text.subtitle}</p>
       </div>
 
       <button
-        className={`black-gift-button ${opened ? "is-open" : ""}`}
+        className="secret-prize-button"
         type="button"
-        onClick={() => setOpened(true)}
-        aria-label="打开最终礼盒"
+        onClick={openSecret}
+        aria-label={text.secretAriaLabel}
       >
-        <span className="gift-shadow" />
-        <span className="gift-glow" />
-        <span className="gift-lid" />
-        <span className="gift-body" />
-        <span className="gift-band vertical" />
-        <span className="gift-band horizontal" />
-        <span className="gift-ribbon" />
-        <span className="gift-bow left" />
-        <span className="gift-bow right" />
-        <span className="gift-shine" />
+        <span>{text.secretButtonText}</span>
+        <small>{text.secretButtonSubText}</small>
       </button>
 
-      {opened && (
-        <div className="final-content">
-          <p className="gift-item dark">{text.item}</p>
+      <div className="final-content">
+        <p className="final-next">{text.nextLine}</p>
+
+        <div className="final-photo-grid">
           <PlaceholderImage
-            className="final-gift-image"
-            src={text.giftImage.src}
-            alt={text.giftImage.alt}
-            label={text.giftImage.label}
+            className="final-photo"
+            src={text.cakeImage.src}
+            alt={text.cakeImage.alt}
+            label={text.cakeImage.label}
           />
-          <p className="final-next">{text.nextLine}</p>
+          <PlaceholderImage
+            className="final-photo"
+            src={text.finalPhoto.src}
+            alt={text.finalPhoto.alt}
+            label={text.finalPhoto.label}
+          />
+        </div>
 
-          <div className="final-photo-grid">
-            <PlaceholderImage
-              className="final-photo"
-              src={text.cakeImage.src}
-              alt={text.cakeImage.alt}
-              label={text.cakeImage.label}
-            />
-            <PlaceholderImage
-              className="final-photo"
-              src={text.finalPhoto.src}
-              alt={text.finalPhoto.alt}
-              label={text.finalPhoto.label}
-            />
+        <div className="blessing-card">
+          {text.blessing.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+
+        <button className="primary-button" type="button" onClick={onRestart}>
+          {text.restartText}
+        </button>
+      </div>
+
+      {secretOpen && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="confirm-modal secret-prize-modal">
+            <h2>{text.secretTitle}</h2>
+            <strong>{text.secretName}</strong>
+            <p>{text.secretDescription}</p>
+            <button
+              className="primary-button"
+              type="button"
+              onClick={() => setSecretOpen(false)}
+            >
+              {text.secretCloseText}
+            </button>
           </div>
-
-          <div className="blessing-card">
-            {text.blessing.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
-
-          <button className="primary-button" type="button" onClick={onRestart}>
-            {text.restartText}
-          </button>
         </div>
       )}
     </div>

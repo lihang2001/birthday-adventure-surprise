@@ -3,6 +3,7 @@ export type SceneId =
   | "firstBattle"
   | "firstGift"
   | "collectHearts"
+  | "secondGift"
   | "memories"
   | "bossBattle"
   | "fakeEnding"
@@ -27,9 +28,11 @@ export interface GiftImage {
   src: string;
   alt: string;
   label: string;
+  type?: "image" | "video";
 }
 
 export interface GiftReward {
+  eyebrow: string;
   lockedTitle: string;
   openedTitle: string;
   closedText: string;
@@ -72,6 +75,7 @@ export const sceneLabels: Record<SceneId, string> = {
   firstBattle: "小怪",
   firstGift: "礼物",
   collectHearts: "收集",
+  secondGift: "礼物",
   memories: "相册",
   bossBattle: "Boss",
   fakeEnding: "结尾",
@@ -115,6 +119,7 @@ export const firstBattle: BattleText = {
 };
 
 export const firstGift: GiftReward = {
+  eyebrow: "Reward 01",
   lockedTitle: "有一个礼盒掉出来了",
   openedTitle: "第一个礼物公开",
   closedText: "礼盒还没打开，先不要偷看。",
@@ -175,8 +180,25 @@ export const collectLevel: CollectLevelText = {
   badItems: ["霉运", "烦恼", "焦虑", "内耗", "坏情绪", "小倒霉"],
   target: 10,
   lives: 3,
-  completeText: "收集完成，解锁回忆相册。",
-  continueText: "打开回忆相册",
+  completeText: "收集完成，掉出第二份小礼物。",
+  continueText: "查看第二份礼物",
+};
+
+export const secondGift: GiftReward = {
+  eyebrow: "Reward 02",
+  lockedTitle: "第二份礼物出现了",
+  openedTitle: "第二个小礼物公开",
+  closedText: "这次先闻到一点香香的预告。",
+  item: "发香喷雾",
+  description: "希望你每天出门的时候，都能带着一点轻轻的好心情。",
+  images: [
+    {
+      src: "/gifts/hair-mist.jpg",
+      alt: "发香喷雾",
+      label: "hair-mist.jpg",
+    },
+  ],
+  continueText: "继续挑战第三关",
 };
 
 export const memories: Memory[] = [
@@ -331,6 +353,23 @@ export const memories: Memory[] = [
 恐怕被我传染了
 默默滴眼泪可怜死了`,
   },
+  {
+    date: "6.12",
+    title: "偷偷准备礼物",
+    images: [
+      {
+        src: "/videos/memory-0612.mp4",
+        alt: "6.12 偷偷准备礼物的视频",
+        label: "视频",
+        type: "video",
+      },
+    ],
+    diary: `偷偷去给你准备礼物
+心里琢磨了半天
+感觉你一定会喜欢
+偷偷摸摸的
+给你准备礼物特别开心`,
+  },
 ];
 
 export const memoryPageText = {
@@ -356,47 +395,117 @@ export const bossBattle: BattleText = {
   id: "boss",
   eyebrow: "Final Battle",
   title: "第三关：贱眼魔王",
-  subtitle: "它守着最后的大奖礼盒，这次要认真打。",
+  subtitle: "它挡在回忆相册前面，这次要认真打。",
   hpLabel: "魔王 HP",
   attackLabel: "攻击贱眼魔王",
   hp: 200,
   damage: 20,
   lines: [
     "最后一关了，敢不敢打重点？",
-    "礼物就在我后面，先过我这关",
+    "相册就在我后面，先过我这关",
     "魔法和拳头都没用吗？",
-    "好吧，大奖是你的了",
+    "好吧，回忆相册是你的了",
   ],
-  defeatedText: "最终礼盒已解锁。",
-  unlockedText: "黑色礼盒出现了",
-  continueText: "查看结尾",
+  defeatedText: "第三关通关，回忆相册已解锁。",
+  unlockedText: "相册钥匙掉出来了",
+  continueText: "打开回忆相册",
 };
 
 export const fakeEndingText = {
   title: "谢谢你一路玩到这里。",
   birthday: "生日快乐。",
-  wish: "希望你今天开心，也希望你新的一岁顺顺利利。",
+  wish:
+    "希望宝宝今天开心，希望宝宝每天开心。你说你的生日老是考试，小小爱哭鬼，不要再流眼泪了昂。今年是我们第一个一起过的生日，要开开心心的，永远都是我最爱的小宝宝。",
   cakeImage: {
     src: "/photos/cake.jpg",
     alt: "生日蛋糕",
     label: "cake.jpg",
   },
+  images: [
+    {
+      src: "/photos/ending-01.jpg",
+      alt: "最后一页照片 1",
+      label: "ending-01.jpg",
+    },
+    {
+      src: "/photos/ending-02.jpg",
+      alt: "最后一页照片 2",
+      label: "ending-02.jpg",
+    },
+    {
+      src: "/photos/ending-03.jpg",
+      alt: "最后一页照片 3",
+      label: "ending-03.jpg",
+    },
+    {
+      src: "/photos/ending-04.jpg",
+      alt: "最后一页照片 4",
+      label: "ending-04.jpg",
+    },
+    {
+      src: "/photos/ending-05.jpg",
+      alt: "最后一页照片 5",
+      label: "ending-05.jpg",
+    },
+    {
+      src: "/photos/ending-06.jpg",
+      alt: "最后一页照片 6",
+      label: "ending-06.jpg",
+    },
+    {
+      src: "/photos/ending-07.jpg",
+      alt: "最后一页照片 7",
+      label: "ending-07.jpg",
+    },
+    {
+      src: "/photos/ending-08.jpg",
+      alt: "最后一页照片 8",
+      label: "ending-08.jpg",
+    },
+    {
+      src: "/photos/ending-09.jpg",
+      alt: "最后一页照片 9",
+      label: "ending-09.jpg",
+    },
+    {
+      src: "/photos/ending-10.jpg",
+      alt: "最后一页照片 10",
+      label: "ending-10.jpg",
+    },
+    {
+      src: "/photos/ending-11.jpg",
+      alt: "最后一页照片 11",
+      label: "ending-11.jpg",
+    },
+    {
+      src: "/photos/ending-12.jpg",
+      alt: "最后一页照片 12",
+      label: "ending-12.jpg",
+    },
+    {
+      src: "/photos/ending-13.jpg",
+      alt: "最后一页照片 13",
+      label: "ending-13.jpg",
+    },
+  ],
   button: "最后再点一下",
   modalTitle: "你不会以为这就结束了吧？",
   modalButtons: ["还有吗？", "我就知道没这么简单"],
 };
 
 export const finalGiftText = {
-  titleBeforeOpen: "最后的黑色礼盒",
-  openHint: "轻点打开",
-  titleAfterOpen: "真正的最后礼物公开",
-  item: "YSL / 巴黎世家卡包",
-  giftImage: {
-    src: "/gifts/final-gift.jpg",
-    alt: "最终礼物",
-    label: "final-gift.jpg",
-  },
-  nextLine: "还有最后一页。",
+  eyebrow: "Final Page",
+  title: "最后一页",
+  subtitle: "真正想放在最后的，是这些话。",
+  secretButtonText: "神秘大奖",
+  secretButtonSubText: "点击就送",
+  secretAriaLabel: "发现神秘大奖",
+  secretTitle: "竟然被你发现了神秘大奖？",
+  secretName: "神秘大奖",
+  secretDescription:
+    "这里确实藏着一个神秘大奖，但内容先不剧透。等它真正出现的时候，你就知道了。",
+  secretCloseText: "先收下这份神秘感",
+  nextLine: "还有最后几张照片和最后几句话。",
   cakeImage: {
     src: "/photos/cake.jpg",
     alt: "生日蛋糕照片",

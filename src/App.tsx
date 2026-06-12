@@ -7,6 +7,7 @@ import FinalReveal from "./components/FinalReveal";
 import GiftReveal from "./components/GiftReveal";
 import MemoryGallery from "./components/MemoryGallery";
 import {
+  albumBgm,
   bossBattle,
   collectLevel,
   coverText,
@@ -15,16 +16,19 @@ import {
   firstGift,
   memories,
   sceneLabels,
+  secondGift,
   type SceneId,
 } from "./data";
+import { playAlbumBgm } from "./sound";
 
 const flow: SceneId[] = [
   "cover",
   "firstBattle",
   "firstGift",
   "collectHearts",
-  "memories",
+  "secondGift",
   "bossBattle",
+  "memories",
   "fakeEnding",
   "finalGift",
 ];
@@ -63,6 +67,9 @@ export default function App() {
 
   const goTo = (next: SceneId) => {
     if (next === scene) return;
+    if (next === "memories") {
+      void playAlbumBgm(albumBgm.src);
+    }
     setScene(next);
   };
 
@@ -79,16 +86,19 @@ export default function App() {
       <GiftReveal reward={firstGift} onContinue={() => goTo("collectHearts")} />
     ),
     collectHearts: (
-      <CollectGame level={collectLevel} onContinue={() => goTo("memories")} />
+      <CollectGame level={collectLevel} onContinue={() => goTo("secondGift")} />
+    ),
+    secondGift: (
+      <GiftReveal reward={secondGift} onContinue={() => goTo("bossBattle")} />
     ),
     memories: (
-      <MemoryGallery memories={memories} onContinue={() => goTo("bossBattle")} />
+      <MemoryGallery memories={memories} onContinue={() => goTo("fakeEnding")} />
     ),
     bossBattle: (
       <BattleGame
         battle={bossBattle}
         variant="boss"
-        onContinue={() => goTo("fakeEnding")}
+        onContinue={() => goTo("memories")}
       />
     ),
     fakeEnding: <FakeEnding onContinue={() => goTo("finalGift")} />,

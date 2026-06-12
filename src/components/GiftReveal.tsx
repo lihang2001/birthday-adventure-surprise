@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { GiftReward } from "../data";
+import { playGiftOpenSound } from "../sound";
 import PlaceholderImage from "./PlaceholderImage";
 
 interface GiftRevealProps {
@@ -9,11 +10,17 @@ interface GiftRevealProps {
 
 export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
   const [opened, setOpened] = useState(false);
+  const openGift = () => {
+    if (!opened) {
+      playGiftOpenSound("cream");
+    }
+    setOpened(true);
+  };
 
   return (
     <div className="screen gift-screen">
       <div className="title-block compact">
-        <p className="eyebrow">Reward 01</p>
+        <p className="eyebrow">{reward.eyebrow}</p>
         <h1>{opened ? reward.openedTitle : reward.lockedTitle}</h1>
         <p>{opened ? reward.description : reward.closedText}</p>
       </div>
@@ -21,7 +28,7 @@ export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
       <button
         className={`gift-box-button ${opened ? "is-open" : ""}`}
         type="button"
-        onClick={() => setOpened(true)}
+        onClick={openGift}
         aria-label="打开第一个礼盒"
       >
         <span className="gift-shadow" />
