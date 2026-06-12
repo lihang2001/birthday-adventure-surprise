@@ -2449,6 +2449,15 @@ p {
   gap: 12px;
 }
 
+.gift-image-grid.image-count-1 {
+  display: flex;
+  justify-content: center;
+}
+
+.gift-image-grid.image-count-1 .gift-image {
+  width: min(100%, 280px);
+}
+
 .soft-image,
 .image-placeholder {
   display: block;
@@ -2962,6 +2971,8 @@ p {
 
 .memory-photo-grid.photo-count-1 {
   aspect-ratio: 4 / 5;
+  place-items: center;
+  padding: 10px;
 }
 
 .memory-photo-grid.photo-count-2,
@@ -2983,6 +2994,25 @@ p {
   padding: 0;
   background: transparent;
   cursor: zoom-in;
+  overflow: hidden;
+}
+
+.memory-photo-grid.photo-count-1 .memory-photo-button {
+  display: grid;
+  width: min(100%, 280px);
+  height: 100%;
+  max-height: 368px;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 252, 246, 0.72);
+}
+
+.memory-photo-grid.photo-count-1 .memory-photo,
+.memory-photo-grid.photo-count-1 .memory-video-wrap {
+  border-radius: 8px;
+}
+
+.memory-photo-grid.photo-count-1 .memory-video-wrap {
   overflow: hidden;
 }
 

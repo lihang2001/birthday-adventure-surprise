@@ -14,12 +14,13 @@ import {
   finalGiftText,
   firstBattle,
   firstGift,
+  gameBgm,
   memories,
   sceneLabels,
   secondGift,
   type SceneId,
 } from "./data";
-import { playAlbumBgm } from "./sound";
+import { pauseAlbumBgm, pauseGameBgm, playAlbumBgm, playGameBgm } from "./sound";
 
 const flow: SceneId[] = [
   "cover",
@@ -68,7 +69,14 @@ export default function App() {
   const goTo = (next: SceneId) => {
     if (next === scene) return;
     if (next === "memories") {
+      pauseGameBgm();
       void playAlbumBgm(albumBgm.src);
+    } else if (next === "cover") {
+      pauseAlbumBgm();
+      pauseGameBgm();
+    } else {
+      pauseAlbumBgm();
+      void playGameBgm(gameBgm.src);
     }
     setScene(next);
   };

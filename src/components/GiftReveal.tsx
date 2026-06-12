@@ -46,7 +46,12 @@ export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
       {opened && (
         <div className="gift-content">
           <p className="gift-item">{reward.item}</p>
-          <div className="gift-image-grid">
+          <div
+            className={`gift-image-grid image-count-${Math.min(
+              reward.images.length,
+              2,
+            )}`}
+          >
             {reward.images.map((image) => (
               <PlaceholderImage
                 className="gift-image"

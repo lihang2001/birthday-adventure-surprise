@@ -391,6 +391,12 @@ export const albumBgm = {
   missingText: "BGM 待放入",
 };
 
+export const gameBgm = {
+  src: "/audio/game-bgm.mp3",
+  title: "地上BGM",
+  artist: "近藤浩治",
+};
+
 export const bossBattle: BattleText = {
   id: "boss",
   eyebrow: "Final Battle",
