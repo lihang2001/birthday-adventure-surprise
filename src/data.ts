@@ -376,6 +376,149 @@ export const memories: Memory[] = [
 偷偷摸摸的
 给你准备礼物特别开心`,
   },
+  {
+    date: "6.12 之后",
+    title: "见到你就充满电",
+    images: [
+      {
+        src: "/photos/memory-after-0612-01.jpg",
+        alt: "6.12 之后的快乐时光 1",
+        label: "图 1",
+      },
+      {
+        src: "/photos/memory-after-0612-02.jpg",
+        alt: "6.12 之后的快乐时光 2",
+        label: "图 2",
+      },
+      {
+        src: "/photos/memory-after-0612-03.jpg",
+        alt: "6.12 之后的快乐时光 3",
+        label: "图 3",
+      },
+      {
+        src: "/photos/memory-after-0612-04.jpg",
+        alt: "6.12 之后的快乐时光 4",
+        label: "图 4",
+      },
+      {
+        src: "/photos/memory-after-0612-05.jpg",
+        alt: "6.12 之后的快乐时光 5",
+        label: "图 5",
+      },
+      {
+        src: "/photos/memory-after-0612-06.jpg",
+        alt: "6.12 之后的快乐时光 6",
+        label: "图 6",
+      },
+      {
+        src: "/photos/memory-after-0612-07.jpg",
+        alt: "6.12 之后的快乐时光 7",
+        label: "图 7",
+      },
+      {
+        src: "/photos/memory-after-0612-08.jpg",
+        alt: "6.12 之后的快乐时光 8",
+        label: "图 8",
+      },
+      {
+        src: "/photos/memory-after-0612-09.jpg",
+        alt: "6.12 之后的快乐时光 9",
+        label: "图 9",
+      },
+      {
+        src: "/photos/memory-after-0612-10.jpg",
+        alt: "6.12 之后的快乐时光 10",
+        label: "图 10",
+      },
+      {
+        src: "/photos/memory-after-0612-11.jpg",
+        alt: "6.12 之后的快乐时光 11",
+        label: "图 11",
+      },
+      {
+        src: "/photos/memory-after-0612-12.jpg",
+        alt: "6.12 之后的快乐时光 12",
+        label: "图 12",
+      },
+      {
+        src: "/photos/memory-after-0612-13.jpg",
+        alt: "6.12 之后的快乐时光 13",
+        label: "图 13",
+      },
+      {
+        src: "/photos/memory-after-0612-14.jpg",
+        alt: "6.12 之后的快乐时光 14",
+        label: "图 14",
+      },
+      {
+        src: "/photos/memory-after-0612-15.jpg",
+        alt: "6.12 之后的快乐时光 15",
+        label: "图 15",
+      },
+      {
+        src: "/photos/memory-after-0612-16.jpg",
+        alt: "6.12 之后的快乐时光 16",
+        label: "图 16",
+      },
+      {
+        src: "/photos/memory-after-0612-17.jpg",
+        alt: "6.12 之后的快乐时光 17",
+        label: "图 17",
+      },
+      {
+        src: "/photos/memory-after-0612-18.jpg",
+        alt: "6.12 之后的快乐时光 18",
+        label: "图 18",
+      },
+      {
+        src: "/photos/memory-after-0612-19.jpg",
+        alt: "6.12 之后的快乐时光 19",
+        label: "图 19",
+      },
+      {
+        src: "/photos/memory-after-0612-20.jpg",
+        alt: "6.12 之后的快乐时光 20",
+        label: "图 20",
+      },
+      {
+        src: "/photos/memory-after-0612-21.jpg",
+        alt: "6.12 之后的快乐时光 21",
+        label: "图 21",
+      },
+      {
+        src: "/photos/memory-after-0612-22.jpg",
+        alt: "6.12 之后的快乐时光 22",
+        label: "图 22",
+      },
+      {
+        src: "/photos/memory-after-0612-23.jpg",
+        alt: "6.12 之后的快乐时光 23",
+        label: "图 23",
+      },
+      {
+        src: "/photos/memory-after-0612-24.jpg",
+        alt: "6.12 之后的快乐时光 24",
+        label: "图 24",
+      },
+      {
+        src: "/photos/memory-after-0612-25.jpg",
+        alt: "6.12 之后的快乐时光 25",
+        label: "图 25",
+      },
+      {
+        src: "/photos/memory-after-0612-26.jpg",
+        alt: "6.12 之后的快乐时光 26",
+        label: "图 26",
+      },
+      {
+        src: "/photos/memory-after-0612-27.jpg",
+        alt: "6.12 之后的快乐时光 27",
+        label: "图 27",
+      },
+    ],
+    diary: `和你在一起，度过了一段非常快乐的时光。
+在忙的工作或者学习之后，见到你也能立刻充满电。`,
+  },
 ];
 
 export const memoryPageText = {
