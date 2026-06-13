@@ -3,6 +3,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type DragEvent,
 } from "react";
 import { assetPath } from "../assetPath";
@@ -15,6 +16,7 @@ import {
   primeGameAudio,
 } from "../sound";
 import GiftBurst from "./GiftBurst";
+import PrizePopImage from "./PrizePopImage";
 
 interface BattleGameProps {
   battle: BattleText;
@@ -38,6 +40,7 @@ interface SpaceGrooveChampion {
   name: string;
   cost: number;
   damage: number;
+  attackIntervalMs: number;
   image: string;
 }
 
@@ -46,54 +49,85 @@ const spaceGrooveChampions: SpaceGrooveChampion[] = [
     id: "nasus",
     name: "内瑟斯",
     cost: 1,
-    damage: 18,
+    damage: 6,
+    attackIntervalMs: 3200,
     image: "/champions/space-groove-nasus.png",
   },
   {
     id: "teemo",
     name: "提莫",
     cost: 1,
-    damage: 18,
+    damage: 7,
+    attackIntervalMs: 2850,
     image: "/champions/space-groove-teemo.png",
   },
   {
     id: "gwen",
     name: "格温",
     cost: 2,
-    damage: 22,
+    damage: 10,
+    attackIntervalMs: 2350,
     image: "/champions/space-groove-gwen.png",
   },
   {
     id: "ornn",
     name: "奥恩",
     cost: 3,
-    damage: 24,
+    damage: 12,
+    attackIntervalMs: 2150,
     image: "/champions/space-groove-ornn.png",
   },
   {
     id: "samira",
     name: "莎弥拉",
     cost: 3,
-    damage: 26,
+    damage: 14,
+    attackIntervalMs: 1800,
     image: "/champions/space-groove-samira.png",
   },
   {
     id: "nami",
     name: "娜美",
     cost: 4,
-    damage: 28,
+    damage: 17,
+    attackIntervalMs: 1500,
     image: "/champions/space-groove-nami.png",
   },
   {
     id: "blitzcrank",
     name: "布里茨",
     cost: 5,
-    damage: 32,
+    damage: 22,
+    attackIntervalMs: 1250,
     image: "/champions/space-groove-blitzcrank.png",
   },
 ];
 
 const spaceGrooveTiers = [1, 3, 5, 7];
+
+function getSpaceGrooveBonus(tier: number) {
+  if (tier >= 7) return { damageMultiplier: 1.45, speedMultiplier: 0.58 };
+  if (tier >= 5) return { damageMultiplier: 1.24, speedMultiplier: 0.74 };
+  if (tier >= 3) return { damageMultiplier: 1.12, speedMultiplier: 0.88 };
+  return { damageMultiplier: 1, speedMultiplier: 1 };
+}
+
+function getChampionDamage(
+  champion: SpaceGrooveChampion,
+  bonus: ReturnType<typeof getSpaceGrooveBonus>,
+) {
+  return Math.max(1, Math.round(champion.damage * bonus.damageMultiplier));
+}
+
+function getChampionAttackInterval(
+  champion: SpaceGrooveChampion,
+  bonus: ReturnType<typeof getSpaceGrooveBonus>,
+) {
+  return Math.max(
+    650,
+    Math.round(champion.attackIntervalMs * bonus.speedMultiplier),
+  );
+}
 
 const monsterSprites: Record<
   BattleText["id"],
@@ -136,11 +170,21 @@ export default function BattleGame({
   );
   const [deployedChampions, setDeployedChampions] = useState<string[]>([]);
   const [traitPulseKey, setTraitPulseKey] = useState(0);
+  const [attackingChampionId, setAttackingChampionId] = useState<string | null>(
+    null,
+  );
+  const [rewardPopVisible, setRewardPopVisible] = useState(false);
+  const hpRef = useRef(battle.hp);
+  const defeatedRef = useRef(false);
+  const comboRef = useRef(0);
   const comboTimerRef = useRef<number | undefined>(undefined);
   const counterStartRef = useRef<number | undefined>(undefined);
   const counterEndRef = useRef<number | undefined>(undefined);
   const rewardReadyRef = useRef<number | undefined>(undefined);
   const playerDamagedRef = useRef<number | undefined>(undefined);
+  const autoAttackTimersRef = useRef<number[]>([]);
+  const championStrikeRef = useRef<number | undefined>(undefined);
+  const rewardPopTimerRef = useRef<number | undefined>(undefined);
 
   const hpPercent = Math.max(0, Math.round((hp / battle.hp) * 100));
   const playerHpPercent = Math.max(
@@ -168,14 +212,26 @@ export default function BattleGame({
         deployedChampions.length >= tier ? tier : activeTier,
       0,
     );
+  const activeSpaceGrooveBonus = getSpaceGrooveBonus(activeSpaceGrooveTier);
+
+  function clearAutoAttackTimers() {
+    autoAttackTimersRef.current.forEach((timer) => {
+      window.clearTimeout(timer);
+      window.clearInterval(timer);
+    });
+    autoAttackTimersRef.current = [];
+  }
 
   useEffect(() => {
     return () => {
+      clearAutoAttackTimers();
       window.clearTimeout(comboTimerRef.current);
       window.clearTimeout(counterStartRef.current);
       window.clearTimeout(counterEndRef.current);
       window.clearTimeout(rewardReadyRef.current);
       window.clearTimeout(playerDamagedRef.current);
+      window.clearTimeout(championStrikeRef.current);
+      window.clearTimeout(rewardPopTimerRef.current);
     };
   }, []);
 
@@ -206,7 +262,7 @@ export default function BattleGame({
     damage = battle.damage,
     attackSource: "player" | "spaceGroove" = "player",
   ) => {
-    if (defeated || hp <= 0) return;
+    if (defeatedRef.current || hpRef.current <= 0) return;
 
     navigator.vibrate?.(
       attackSource === "spaceGroove"
@@ -222,10 +278,14 @@ export default function BattleGame({
     setImpacting(false);
     window.requestAnimationFrame(() => setImpacting(true));
     window.setTimeout(() => setImpacting(false), impactDuration);
-    const nextCombo = combo + 1;
+    const nextCombo = comboRef.current + 1;
+    comboRef.current = nextCombo;
     setCombo(nextCombo);
     window.clearTimeout(comboTimerRef.current);
-    comboTimerRef.current = window.setTimeout(() => setCombo(0), 900);
+    comboTimerRef.current = window.setTimeout(() => {
+      comboRef.current = 0;
+      setCombo(0);
+    }, 900);
     setShakeKey((key) => key + 1);
     setHits((current) => [
       ...current,
@@ -249,16 +309,33 @@ export default function BattleGame({
 
     setHp((current) => {
       const next = Math.max(0, current - damage);
+      hpRef.current = next;
       if (next === 0) {
+        defeatedRef.current = true;
+        clearAutoAttackTimers();
         window.clearTimeout(counterStartRef.current);
         window.clearTimeout(counterEndRef.current);
         window.clearTimeout(playerDamagedRef.current);
+        window.clearTimeout(championStrikeRef.current);
+        setAttackingChampionId(null);
         setCountering(false);
         setPlayerDamaged(false);
         setRewardReady(false);
         playBattleVictorySound(battle.id);
         window.setTimeout(() => {
-          playRewardFireworkSound(variant === "boss" ? "black" : "cream");
+          playRewardFireworkSound(
+            variant === "boss" ? "black" : "cream",
+            battle.id === "first" || battle.id === "boss"
+              ? "custom"
+              : "default",
+          );
+          if (battle.rewardPopImage) {
+            setRewardPopVisible(true);
+            window.clearTimeout(rewardPopTimerRef.current);
+            rewardPopTimerRef.current = window.setTimeout(() => {
+              setRewardPopVisible(false);
+            }, 2800);
+          }
           setDefeated(true);
           window.clearTimeout(rewardReadyRef.current);
           rewardReadyRef.current = window.setTimeout(() => {
@@ -282,14 +359,7 @@ export default function BattleGame({
       current.includes(championId) ? current : [...current, championId],
     );
     setTraitPulseKey((key) => key + 1);
-    window.setTimeout(() => {
-      attack(champion.damage, "spaceGroove");
-    }, 120);
-  };
-
-  const attackWithChampion = (champion: SpaceGrooveChampion) => {
-    if (!isFinalBoss || defeated) return;
-    attack(champion.damage, "spaceGroove");
+    primeGameAudio();
   };
 
   const handleChampionDragStart = (
@@ -313,6 +383,70 @@ export default function BattleGame({
     if (championId) deployChampion(championId);
     setDraggingChampionId(null);
   };
+
+  useEffect(() => {
+    clearAutoAttackTimers();
+
+    if (!isFinalBoss || defeated || !deployedChampions.length) {
+      return undefined;
+    }
+
+    const timers: number[] = [];
+
+    const runAutoAttack = (champion: SpaceGrooveChampion) => {
+      if (defeatedRef.current || hpRef.current <= 0) return;
+
+      const damage = getChampionDamage(champion, activeSpaceGrooveBonus);
+      setAttackingChampionId(champion.id);
+      window.clearTimeout(championStrikeRef.current);
+      championStrikeRef.current = window.setTimeout(() => {
+        setAttackingChampionId(null);
+      }, 430);
+      attack(damage, "spaceGroove");
+    };
+
+    deployedChampions.forEach((championId, index) => {
+      const champion = spaceGrooveChampions.find((item) => item.id === championId);
+      if (!champion) return;
+
+      const interval = getChampionAttackInterval(
+        champion,
+        activeSpaceGrooveBonus,
+      );
+      const firstDelay = Math.max(
+        650,
+        Math.round(interval * (0.48 + index * 0.08)),
+      );
+      const startTimer = window.setTimeout(() => {
+        runAutoAttack(champion);
+        const loopTimer = window.setInterval(() => {
+          runAutoAttack(champion);
+        }, interval);
+        timers.push(loopTimer);
+        autoAttackTimersRef.current = timers;
+      }, firstDelay);
+
+      timers.push(startTimer);
+    });
+
+    autoAttackTimersRef.current = timers;
+
+    return () => {
+      timers.forEach((timer) => {
+        window.clearTimeout(timer);
+        window.clearInterval(timer);
+      });
+      autoAttackTimersRef.current = autoAttackTimersRef.current.filter(
+        (timer) => !timers.includes(timer),
+      );
+    };
+  }, [
+    activeSpaceGrooveBonus.damageMultiplier,
+    activeSpaceGrooveBonus.speedMultiplier,
+    defeated,
+    deployedChampions,
+    isFinalBoss,
+  ]);
 
   return (
     <div className={`screen battle-screen battle-${variant} battle-id-${battle.id}`}>
@@ -537,13 +671,28 @@ export default function BattleGame({
                       (item) => item.id === championId,
                     );
                     if (!champion) return null;
+                    const championDamage = getChampionDamage(
+                      champion,
+                      activeSpaceGrooveBonus,
+                    );
+                    const championInterval = getChampionAttackInterval(
+                      champion,
+                      activeSpaceGrooveBonus,
+                    );
 
                     return (
-                      <button
-                        className="field-champion"
+                      <div
+                        className={`field-champion ${
+                          attackingChampionId === champion.id
+                            ? "is-attacking"
+                            : ""
+                        }`}
                         key={champion.id}
-                        type="button"
-                        onClick={() => attackWithChampion(champion)}
+                        style={
+                          {
+                            "--attack-speed": `${championInterval}ms`,
+                          } as CSSProperties
+                        }
                         aria-label={`${champion.name} 攻击大 Boss`}
                       >
                         <img
@@ -552,7 +701,8 @@ export default function BattleGame({
                           draggable={false}
                         />
                         <span>{champion.name}</span>
-                      </button>
+                        <small>-{championDamage}</small>
+                      </div>
                     );
                   })
                 ) : (
@@ -611,6 +761,10 @@ export default function BattleGame({
             {battle.continueText}
           </button>
         </div>
+      )}
+
+      {rewardPopVisible && battle.rewardPopImage && (
+        <PrizePopImage image={battle.rewardPopImage} />
       )}
     </div>
   );

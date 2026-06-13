@@ -23,6 +23,7 @@ export interface BattleText {
   defeatedText: string;
   unlockedText: string;
   continueText: string;
+  rewardPopImage?: GiftImage;
 }
 
 export interface GiftImage {
@@ -42,6 +43,8 @@ export interface GiftReward {
   description: string;
   images: GiftImage[];
   continueText: string;
+  soundStyle?: "default" | "custom";
+  popImage?: GiftImage;
 }
 
 export interface Memory {
@@ -141,6 +144,12 @@ export const firstGift: GiftReward = {
     },
   ],
   continueText: "继续冒险",
+  soundStyle: "custom",
+  popImage: {
+    src: "/photos/prize-pop-level-1.jpg",
+    alt: "level 1 prize pop image",
+    label: "prize-pop-level-1.jpg",
+  },
 };
 
 export const collectLevel: CollectLevelText = {
@@ -202,6 +211,11 @@ export const secondGift: GiftReward = {
     },
   ],
   continueText: "继续挑战第三关",
+  popImage: {
+    src: "/photos/prize-pop-level-2.jpg",
+    alt: "level 2 prize pop image",
+    label: "prize-pop-level-2.jpg",
+  },
 };
 
 export const memories: Memory[] = [
@@ -590,6 +604,11 @@ export const bossBattle: BattleText = {
   defeatedText: "第三关通关，回忆相册已解锁。",
   unlockedText: "相册钥匙掉出来了",
   continueText: "打开回忆相册",
+  rewardPopImage: {
+    src: "/photos/prize-pop-level-3.jpg",
+    alt: "level 3 prize pop image",
+    label: "prize-pop-level-3.jpg",
+  },
 };
 
 export const fakeEndingText = {

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { GiftReward } from "../data";
 import { playGiftOpenSound } from "../sound";
 import PlaceholderImage from "./PlaceholderImage";
+import PrizePopImage from "./PrizePopImage";
 
 interface GiftRevealProps {
   reward: GiftReward;
@@ -12,9 +13,23 @@ const openConfetti = Array.from({ length: 24 }, (_, index) => index + 1);
 
 export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
   const [opened, setOpened] = useState(false);
+  const [popVisible, setPopVisible] = useState(false);
+  const popTimerRef = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    return () => window.clearTimeout(popTimerRef.current);
+  }, []);
+
   const openGift = () => {
     if (!opened) {
-      playGiftOpenSound("cream");
+      playGiftOpenSound("cream", reward.soundStyle ?? "default");
+      if (reward.popImage) {
+        setPopVisible(true);
+        window.clearTimeout(popTimerRef.current);
+        popTimerRef.current = window.setTimeout(() => {
+          setPopVisible(false);
+        }, 2800);
+      }
     }
     setOpened(true);
   };
@@ -51,6 +66,8 @@ export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
           </span>
         )}
       </button>
+
+      {popVisible && reward.popImage && <PrizePopImage image={reward.popImage} />}
 
       {opened && (
         <div className="gift-content">

@@ -2,6 +2,7 @@ import { assetPath } from "./assetPath";
 
 type BattleSoundId = "first" | "boss";
 type GiftSoundVariant = "cream" | "black";
+type RewardSoundStyle = "default" | "custom";
 type MediaPlayResult = "playing" | "blocked" | "missing";
 
 const punchSounds = [
@@ -21,6 +22,7 @@ const metalSounds = [
 const collectGoodSounds = ["/audio/collect-good-1.ogg", "/audio/collect-good-2.ogg"];
 const collectBadSounds = ["/audio/collect-bad-1.ogg"];
 const rewardWowSound = "/audio/reward-wow.mp3";
+const rewardCustomSound = "/audio/reward-pop-custom.mp4";
 const rewardFireworksSound = "/audio/reward-fireworks.wav";
 
 type WebAudioWindow = Window &
@@ -367,14 +369,17 @@ export function playBattleVictorySound(id: BattleSoundId) {
   });
 }
 
-export function playRewardFireworkSound(variant: GiftSoundVariant = "cream") {
+export function playRewardFireworkSound(
+  variant: GiftSoundVariant = "cream",
+  soundStyle: RewardSoundStyle = "default",
+) {
   primeGameAudio();
 
   const now = performance.now();
   if (now - lastRewardFireworkAt < 420) return;
   lastRewardFireworkAt = now;
 
-  playCelebrationAssets(variant, "burst");
+  playCelebrationAssets(variant, "burst", soundStyle);
 
   const context = getAudioContext();
   if (!context) return;
@@ -449,10 +454,13 @@ export function playCounterAttackSound(id: BattleSoundId) {
   playSword(context);
 }
 
-export function playGiftOpenSound(variant: GiftSoundVariant = "cream") {
+export function playGiftOpenSound(
+  variant: GiftSoundVariant = "cream",
+  soundStyle: RewardSoundStyle = "default",
+) {
   primeGameAudio();
 
-  playCelebrationAssets(variant, "open");
+  playCelebrationAssets(variant, "open", soundStyle);
 
   const context = getAudioContext();
   if (!context) return;
@@ -606,12 +614,14 @@ function seekAudio(audio: HTMLAudioElement, seconds: number) {
 function playCelebrationAssets(
   variant: GiftSoundVariant,
   phase: "burst" | "open",
+  soundStyle: RewardSoundStyle = "default",
 ) {
   const isBlack = variant === "black";
   const isOpen = phase === "open";
+  const useCustomSound = soundStyle === "custom";
 
-  playAsset(rewardWowSound, {
-    volume: isBlack ? 0.22 : 0.28,
+  playAsset(useCustomSound ? rewardCustomSound : rewardWowSound, {
+    volume: useCustomSound ? (isBlack ? 0.15 : 0.18) : isBlack ? 0.22 : 0.28,
     playbackRate: isOpen ? 1 : 0.96,
   });
   playAsset(rewardFireworksSound, {
