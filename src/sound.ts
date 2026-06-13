@@ -1,3 +1,5 @@
+import { assetPath } from "./assetPath";
+
 type BattleSoundId = "first" | "boss";
 type GiftSoundVariant = "cream" | "black";
 type MediaPlayResult = "playing" | "blocked" | "missing";
@@ -63,12 +65,13 @@ function connectOutput(node: AudioNode, context: AudioContext) {
 }
 
 function getAudio(src: string) {
-  const cached = audioCache.get(src);
+  const resolvedSrc = assetPath(src);
+  const cached = audioCache.get(resolvedSrc);
   if (cached) return cached;
 
-  const audio = new Audio(src);
+  const audio = new Audio(resolvedSrc);
   audio.preload = "auto";
-  audioCache.set(src, audio);
+  audioCache.set(resolvedSrc, audio);
   return audio;
 }
 
@@ -532,39 +535,45 @@ export function playCollectBadSound() {
 }
 
 function getAlbumAudio(src: string) {
-  if (!albumAudio || albumAudioSrc !== src) {
+  const resolvedSrc = assetPath(src);
+
+  if (!albumAudio || albumAudioSrc !== resolvedSrc) {
     albumAudio?.pause();
-    albumAudio = new Audio(src);
+    albumAudio = new Audio(resolvedSrc);
     albumAudio.preload = "auto";
     albumAudio.loop = true;
     albumAudio.volume = 0.38;
-    albumAudioSrc = src;
+    albumAudioSrc = resolvedSrc;
   }
 
   return albumAudio;
 }
 
 function getGameAudio(src: string) {
-  if (!gameAudio || gameAudioSrc !== src) {
+  const resolvedSrc = assetPath(src);
+
+  if (!gameAudio || gameAudioSrc !== resolvedSrc) {
     gameAudio?.pause();
-    gameAudio = new Audio(src);
+    gameAudio = new Audio(resolvedSrc);
     gameAudio.preload = "auto";
     gameAudio.loop = true;
     gameAudio.volume = 0.22;
-    gameAudioSrc = src;
+    gameAudioSrc = resolvedSrc;
   }
 
   return gameAudio;
 }
 
 function getFinalAudio(src: string) {
-  if (!finalAudio || finalAudioSrc !== src) {
+  const resolvedSrc = assetPath(src);
+
+  if (!finalAudio || finalAudioSrc !== resolvedSrc) {
     finalAudio?.pause();
-    finalAudio = new Audio(src);
+    finalAudio = new Audio(resolvedSrc);
     finalAudio.preload = "auto";
     finalAudio.loop = true;
     finalAudio.volume = 0.34;
-    finalAudioSrc = src;
+    finalAudioSrc = resolvedSrc;
   }
 
   return finalAudio;

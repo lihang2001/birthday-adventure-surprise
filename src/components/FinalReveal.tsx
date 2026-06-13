@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { assetPath } from "../assetPath";
 import type { FinalGiftText } from "../data";
 import { playGiftOpenSound } from "../sound";
 import PlaceholderImage from "./PlaceholderImage";
@@ -21,7 +22,7 @@ function FinalMedia({
     return (
       <video
         className="soft-image final-photo final-video"
-        src={item.src}
+        src={assetPath(item.src)}
         aria-label={item.alt}
         autoPlay
         loop

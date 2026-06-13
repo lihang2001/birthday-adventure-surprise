@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { assetPath } from "../assetPath";
 import { albumBgm, memoryPageText, type GiftImage, type Memory } from "../data";
 import { isAlbumBgmPlaying, pauseAlbumBgm, playAlbumBgm } from "../sound";
 import PlaceholderImage from "./PlaceholderImage";
@@ -26,7 +27,7 @@ function MemoryMedia({
       <span className={`memory-video-wrap ${modal ? "is-modal" : ""}`}>
         <video
           className={`soft-image ${className}`}
-          src={item.src}
+          src={assetPath(item.src)}
           aria-label={item.alt}
           controls={modal}
           muted={!modal}

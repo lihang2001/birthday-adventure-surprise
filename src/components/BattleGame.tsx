@@ -5,6 +5,7 @@ import {
   useState,
   type DragEvent,
 } from "react";
+import { assetPath } from "../assetPath";
 import type { BattleText } from "../data";
 import {
   playBattleHitSound,
@@ -376,19 +377,19 @@ export default function BattleGame({
                 {isFinalBoss && <span className="boss-depth-shadow" aria-hidden="true" />}
                 <img
                   className="boss-sprite boss-idle"
-                  src={sprite.idle}
+                  src={assetPath(sprite.idle)}
                   alt={sprite.alt}
                   draggable={false}
                 />
                 <img
                   className="boss-sprite boss-hurt"
-                  src={sprite.hurt}
+                  src={assetPath(sprite.hurt)}
                   alt=""
                   draggable={false}
                 />
                 <img
                   className="boss-sprite boss-attack"
-                  src={sprite.attack}
+                  src={assetPath(sprite.attack)}
                   alt=""
                   draggable={false}
                 />
@@ -545,7 +546,11 @@ export default function BattleGame({
                         onClick={() => attackWithChampion(champion)}
                         aria-label={`${champion.name} 攻击大 Boss`}
                       >
-                        <img src={champion.image} alt="" draggable={false} />
+                        <img
+                          src={assetPath(champion.image)}
+                          alt=""
+                          draggable={false}
+                        />
                         <span>{champion.name}</span>
                       </button>
                     );
@@ -575,7 +580,11 @@ export default function BattleGame({
                       onDragEnd={handleChampionDragEnd}
                       aria-label={`${champion.name} 上场`}
                     >
-                      <img src={champion.image} alt="" draggable={false} />
+                      <img
+                        src={assetPath(champion.image)}
+                        alt=""
+                        draggable={false}
+                      />
                       <span>{champion.name}</span>
                       <small>{champion.cost}费</small>
                     </button>

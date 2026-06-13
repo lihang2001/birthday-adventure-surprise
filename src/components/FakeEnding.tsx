@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { assetPath } from "../assetPath";
 import { fakeEndingText, type GiftImage } from "../data";
 import PlaceholderImage from "./PlaceholderImage";
 
@@ -20,7 +21,7 @@ function EndingMedia({
     return (
       <video
         className={`soft-image ${className} ending-video ${orientationClass}`}
-        src={item.src}
+        src={assetPath(item.src)}
         aria-label={item.alt}
         autoPlay
         loop

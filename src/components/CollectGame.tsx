@@ -5,6 +5,7 @@ import {
   useState,
   type PointerEvent,
 } from "react";
+import { assetPath } from "../assetPath";
 import type { CollectLevelText } from "../data";
 import {
   playCollectBadSound,
@@ -314,7 +315,7 @@ export default function CollectGame({ level, onContinue }: CollectGameProps) {
           <img
             className="player-avatar-image"
             key={currentAvatar.src}
-            src={currentAvatar.src}
+            src={assetPath(currentAvatar.src)}
             alt={currentAvatar.alt}
             draggable={false}
           />

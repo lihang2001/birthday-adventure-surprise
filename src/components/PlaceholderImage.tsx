@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { assetPath } from "../assetPath";
 
 interface PlaceholderImageProps {
   src: string;
@@ -28,7 +29,7 @@ export default function PlaceholderImage({
   return (
     <img
       className={`soft-image ${className}`}
-      src={src}
+      src={assetPath(src)}
       alt={alt}
       onError={() => setFailed(true)}
       draggable={false}
