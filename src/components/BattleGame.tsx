@@ -12,7 +12,6 @@ import {
   playBattleHitSound,
   playBattleVictorySound,
   playCounterAttackSound,
-  playRewardFireworkSound,
   primeGameAudio,
 } from "../sound";
 import GiftBurst from "./GiftBurst";
@@ -323,12 +322,6 @@ export default function BattleGame({
         setRewardReady(false);
         playBattleVictorySound(battle.id);
         window.setTimeout(() => {
-          playRewardFireworkSound(
-            variant === "boss" ? "black" : "cream",
-            battle.id === "first" || battle.id === "boss"
-              ? "custom"
-              : "default",
-          );
           if (battle.rewardPopImage) {
             setRewardPopVisible(true);
             window.clearTimeout(rewardPopTimerRef.current);

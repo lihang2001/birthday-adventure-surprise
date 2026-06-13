@@ -99,6 +99,30 @@ function playAsset(
   void audio.play().catch(() => undefined);
 }
 
+function createAssetClip(
+  src: string,
+  {
+    volume = 0.8,
+    playbackRate = 1,
+  }: {
+    volume?: number;
+    playbackRate?: number;
+  } = {},
+) {
+  const baseAudio = getAudio(src);
+  const audio = baseAudio.cloneNode(true) as HTMLAudioElement;
+  audio.volume = Math.min(Math.max(volume, 0), 1);
+  audio.playbackRate = playbackRate;
+  audio.currentTime = 0;
+  return audio;
+}
+
+function playClipsTogether(clips: HTMLAudioElement[]) {
+  clips.forEach((clip) => {
+    void clip.play().catch(() => undefined);
+  });
+}
+
 function playTone(
   context: AudioContext,
   {
@@ -289,6 +313,7 @@ export function primeGameAudio() {
     ...collectGoodSounds,
     ...collectBadSounds,
     rewardWowSound,
+    rewardCustomSound,
     rewardFireworksSound,
   ].forEach((src) => {
     getAudio(src).load();
@@ -620,14 +645,19 @@ function playCelebrationAssets(
   const isOpen = phase === "open";
   const useCustomSound = soundStyle === "custom";
 
-  playAsset(useCustomSound ? rewardCustomSound : rewardWowSound, {
-    volume: useCustomSound ? (isBlack ? 0.15 : 0.18) : isBlack ? 0.22 : 0.28,
-    playbackRate: isOpen ? 1 : 0.96,
-  });
-  playAsset(rewardFireworksSound, {
+  const rewardClip = createAssetClip(
+    useCustomSound ? rewardCustomSound : rewardWowSound,
+    {
+      volume: useCustomSound ? (isBlack ? 0.15 : 0.18) : isBlack ? 0.22 : 0.28,
+      playbackRate: isOpen ? 1 : 0.96,
+    },
+  );
+  const fireworkClip = createAssetClip(rewardFireworksSound, {
     volume: isBlack ? 0.68 : 0.78,
     playbackRate: isOpen ? 1.02 : 0.96,
   });
+
+  playClipsTogether([rewardClip, fireworkClip]);
 }
 
 export async function playGameBgm(src: string): Promise<MediaPlayResult> {

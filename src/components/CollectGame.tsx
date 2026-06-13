@@ -10,7 +10,6 @@ import type { CollectLevelText } from "../data";
 import {
   playCollectBadSound,
   playCollectGoodSound,
-  playRewardFireworkSound,
   primeGameAudio,
 } from "../sound";
 import GiftBurst from "./GiftBurst";
@@ -161,7 +160,6 @@ export default function CollectGame({ level, onContinue }: CollectGameProps) {
         if (nextCollected >= level.target) {
           completeRef.current = true;
           setRewardReady(false);
-          playRewardFireworkSound("cream");
           setComplete(true);
           setMessage(level.completeText);
           window.clearTimeout(rewardReadyRef.current);

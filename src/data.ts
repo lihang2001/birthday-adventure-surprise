@@ -183,7 +183,7 @@ export const collectLevel: CollectLevelText = {
     "好眠",
     "美食",
     "暴富",
-    "被爱",
+    "被偏爱",
     "好消息",
     "小惊喜",
     "轻松",
@@ -547,11 +547,17 @@ export const memories: Memory[] = [
 
 export const memoryIntroText = {
   eyebrow: "Album Unlocked",
-  title: "回忆相册已解锁",
-  subtitle:
-    "刚刚打败 Boss 掉出来的不是普通钥匙，是一整本慢慢翻开的回忆。",
-  note: "前面不是新的关卡了，接下来是我们一起走过的一小段路。",
-  button: "打开回忆相册",
+  title: "打赢啦",
+  subtitle: `其实这一路的关卡、礼物、奖励，
+都只是为了把你带到这里。`,
+  note: `因为真正想送给你的，
+不是游戏里的通关，
+是我们一起留下来的这些瞬间。
+
+有些照片很模糊，
+有些画面也没有拍完整，
+但模糊的照片记录不完俺们的幸福。`,
+  button: "打开我们的回忆",
 };
 
 export const memoryPageText = {

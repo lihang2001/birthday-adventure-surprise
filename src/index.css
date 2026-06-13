@@ -3995,6 +3995,11 @@ p {
   color: var(--muted);
   font-size: 0.92rem;
   line-height: 1.7;
+  white-space: pre-line;
+}
+
+.album-intro-screen .title-block > p:last-child {
+  white-space: pre-line;
 }
 
 .memory-stage {
