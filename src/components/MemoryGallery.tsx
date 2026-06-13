@@ -12,9 +12,15 @@ interface MemoryMediaProps {
   item: GiftImage;
   className: string;
   modal?: boolean;
+  onVideoPlay?: () => void;
 }
 
-function MemoryMedia({ item, className, modal = false }: MemoryMediaProps) {
+function MemoryMedia({
+  item,
+  className,
+  modal = false,
+  onVideoPlay,
+}: MemoryMediaProps) {
   if (item.type === "video") {
     return (
       <span className={`memory-video-wrap ${modal ? "is-modal" : ""}`}>
@@ -28,6 +34,7 @@ function MemoryMedia({ item, className, modal = false }: MemoryMediaProps) {
           playsInline
           preload="metadata"
           autoPlay={!modal}
+          onPlay={onVideoPlay}
         />
         {!modal && <span className="memory-video-badge">视频</span>}
       </span>
@@ -102,6 +109,17 @@ export default function MemoryGallery({
     }
   };
 
+  const keepAlbumBgmWithVideo = async () => {
+    if (bgmState === "missing") return;
+
+    const result = await playAlbumBgm(albumBgm.src);
+    if (result === "playing") {
+      setBgmState("playing");
+    } else if (result === "missing") {
+      setBgmState("missing");
+    }
+  };
+
   const goToMemory = (index: number) => {
     setActive(index);
     setSelectedMedia(0);
@@ -117,6 +135,9 @@ export default function MemoryGallery({
 
   const openMedia = (index: number) => {
     if (!currentMedia.length) return;
+    if (currentMedia[index]?.type === "video") {
+      void keepAlbumBgmWithVideo();
+    }
     setSelectedMedia(index);
     setModalOpen(true);
   };
@@ -278,7 +299,14 @@ export default function MemoryGallery({
                   ‹
                 </button>
               )}
-              <MemoryMedia item={selectedItem} className="modal-photo" modal />
+              <MemoryMedia
+                item={selectedItem}
+                className="modal-photo"
+                modal
+                onVideoPlay={() => {
+                  void keepAlbumBgmWithVideo();
+                }}
+              />
               {currentMedia.length > 1 && (
                 <button
                   className="modal-photo-nav modal-photo-next"

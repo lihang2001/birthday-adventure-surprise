@@ -30,6 +30,7 @@ export interface GiftImage {
   alt: string;
   label: string;
   type?: "image" | "video";
+  orientation?: "flip-y";
 }
 
 export interface GiftReward {
@@ -623,15 +624,34 @@ export const fakeEndingText = {
       label: "ending-04.jpg",
     },
     {
+      src: "/photos/ending-05.jpg",
+      alt: "ending photo 5",
+      label: "ending-05.jpg",
+    },
+    {
       src: "/videos/ending-extra-video.mp4",
       alt: "海边的小视频",
       label: "短视频",
       type: "video",
     },
     {
-      src: "/photos/ending-05.jpg",
-      alt: "最后一页照片 5",
-      label: "ending-05.jpg",
+      src: "/videos/ending-extra-video-02.mp4",
+      alt: "最后一页的小视频 2",
+      label: "短视频 2",
+      type: "video",
+    },
+    {
+      src: "/videos/ending-extra-video-03.mp4",
+      alt: "flipped ending video 3",
+      label: "video 3",
+      type: "video",
+      orientation: "flip-y",
+    },
+    {
+      src: "/videos/ending-extra-video-04.mp4",
+      alt: "ending video 4",
+      label: "video 4",
+      type: "video",
     },
     {
       src: "/photos/ending-06.jpg",
@@ -704,6 +724,53 @@ export const finalGiftText = {
     label: "短视频 2",
     type: "video",
   },
+  finalMediaColumns: [
+    [
+      {
+        src: "/videos/final-loop-01.mp4",
+        alt: "final opening video 1",
+        label: "video 1",
+        type: "video",
+      },
+      {
+        src: "/videos/final-carousel-03.mp4",
+        alt: "final carousel video 3",
+        label: "video 3",
+        type: "video",
+      },
+      {
+        src: "/videos/final-carousel-05.mp4",
+        alt: "final carousel video 5",
+        label: "video 5",
+        type: "video",
+      },
+      {
+        src: "/photos/final-carousel-07.jpg",
+        alt: "final carousel photo 7",
+        label: "photo 7",
+      },
+    ],
+    [
+      {
+        src: "/videos/final-loop-02.mp4",
+        alt: "final opening video 2",
+        label: "video 2",
+        type: "video",
+      },
+      {
+        src: "/videos/final-carousel-04.mp4",
+        alt: "final carousel video 4",
+        label: "video 4",
+        type: "video",
+      },
+      {
+        src: "/videos/final-carousel-06.mp4",
+        alt: "final carousel video 6",
+        label: "video 6",
+        type: "video",
+      },
+    ],
+  ] satisfies GiftImage[][],
   blessing: [
     "生日快乐。",
     "这不是一个特别复杂的小游戏，但里面的每一关，都是我想给你准备的小惊喜。",

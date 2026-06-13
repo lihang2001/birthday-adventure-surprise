@@ -14,9 +14,12 @@ function EndingMedia({
   className: string;
 }) {
   if (item.type === "video") {
+    const orientationClass =
+      item.orientation === "flip-y" ? "is-flipped-y" : "";
+
     return (
       <video
-        className={`soft-image ${className} ending-video`}
+        className={`soft-image ${className} ending-video ${orientationClass}`}
         src={item.src}
         aria-label={item.alt}
         autoPlay

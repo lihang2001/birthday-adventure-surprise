@@ -145,14 +145,17 @@ export default function App() {
         {visibleScene !== "cover" && (
           <nav className="progress-strip" aria-label="冒险进度">
             {flow.slice(1).map((step, index) => (
-              <span
+              <button
                 className={`progress-dot ${
                   index + 1 <= progressIndex ? "is-active" : ""
                 }`}
                 key={step}
+                type="button"
+                onClick={() => goTo(step)}
+                aria-current={step === visibleScene ? "step" : undefined}
               >
                 <span>{sceneLabels[step]}</span>
-              </span>
+              </button>
             ))}
           </nav>
         )}

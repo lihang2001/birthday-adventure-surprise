@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FinalGiftText } from "../data";
 import { playGiftOpenSound } from "../sound";
 import PlaceholderImage from "./PlaceholderImage";
@@ -8,14 +8,16 @@ interface FinalRevealProps {
   onRestart: () => void;
 }
 
-const secretConfetti = Array.from({ length: 18 }, (_, index) => index + 1);
+const secretConfetti = Array.from({ length: 24 }, (_, index) => index + 1);
+
+type FinalMediaItem = FinalGiftText["finalMediaColumns"][number][number];
 
 function FinalMedia({
   item,
 }: {
-  item: FinalGiftText["cakeImage"] | FinalGiftText["finalPhoto"];
+  item: FinalMediaItem;
 }) {
-  if ("type" in item && item.type === "video") {
+  if (item.type === "video") {
     return (
       <video
         className="soft-image final-photo final-video"
@@ -40,8 +42,54 @@ function FinalMedia({
   );
 }
 
+function FinalMediaCarousel({
+  items,
+  columnIndex,
+}: {
+  items: FinalMediaItem[];
+  columnIndex: number;
+}) {
+  const [active, setActive] = useState(0);
+  const activeItem = items[active] ?? items[0];
+
+  useEffect(() => {
+    setActive(0);
+  }, [items]);
+
+  useEffect(() => {
+    if (items.length <= 1) return undefined;
+
+    const timer = window.setInterval(
+      () => {
+        setActive((index) => (index + 1) % items.length);
+      },
+      columnIndex === 0 ? 5200 : 5900,
+    );
+
+    return () => window.clearInterval(timer);
+  }, [columnIndex, items.length]);
+
+  return (
+    <div className="final-carousel-frame">
+      <FinalMedia item={activeItem} />
+      {items.length > 1 && (
+        <span className="final-carousel-dots" aria-hidden="true">
+          {items.map((item, index) => (
+            <span
+              className={index === active ? "is-active" : ""}
+              key={item.src}
+            />
+          ))}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function FinalReveal({ text, onRestart }: FinalRevealProps) {
   const [secretOpen, setSecretOpen] = useState(false);
+  const mediaColumns = text.finalMediaColumns;
+
   const openSecret = () => {
     if (!secretOpen) {
       playGiftOpenSound("black");
@@ -71,8 +119,13 @@ export default function FinalReveal({ text, onRestart }: FinalRevealProps) {
         <p className="final-next">{text.nextLine}</p>
 
         <div className="final-photo-grid">
-          <FinalMedia item={text.cakeImage} />
-          <FinalMedia item={text.finalPhoto} />
+          {mediaColumns.map((items, index) => (
+            <FinalMediaCarousel
+              columnIndex={index}
+              items={items}
+              key={`final-column-${index}`}
+            />
+          ))}
         </div>
 
         <div className="blessing-card">

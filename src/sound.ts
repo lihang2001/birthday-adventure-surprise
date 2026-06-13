@@ -602,11 +602,11 @@ function playCelebrationAssets(
   const isOpen = phase === "open";
 
   playAsset(rewardWowSound, {
-    volume: isBlack ? 0.72 : 0.82,
+    volume: isBlack ? 0.22 : 0.28,
     playbackRate: isOpen ? 1 : 0.96,
   });
   playAsset(rewardFireworksSound, {
-    volume: isBlack ? 0.52 : 0.62,
+    volume: isBlack ? 0.68 : 0.78,
     playbackRate: isOpen ? 1.02 : 0.96,
   });
 }

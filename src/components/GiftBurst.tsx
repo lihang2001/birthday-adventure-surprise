@@ -3,8 +3,8 @@ interface GiftBurstProps {
   variant?: "cream" | "black";
 }
 
-const sparks = Array.from({ length: 16 }, (_, index) => index + 1);
-const ribbons = Array.from({ length: 8 }, (_, index) => index + 1);
+const sparks = Array.from({ length: 24 }, (_, index) => index + 1);
+const ribbons = Array.from({ length: 12 }, (_, index) => index + 1);
 
 export default function GiftBurst({ label, variant = "cream" }: GiftBurstProps) {
   return (

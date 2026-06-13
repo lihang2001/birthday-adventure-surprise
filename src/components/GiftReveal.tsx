@@ -8,7 +8,7 @@ interface GiftRevealProps {
   onContinue: () => void;
 }
 
-const openConfetti = Array.from({ length: 18 }, (_, index) => index + 1);
+const openConfetti = Array.from({ length: 24 }, (_, index) => index + 1);
 
 export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
   const [opened, setOpened] = useState(false);
