@@ -247,9 +247,10 @@ button {
   top: 0;
   z-index: 5;
   display: flex;
-  gap: 6px;
+  justify-content: center;
+  gap: 7px;
   overflow-x: auto;
-  padding: 10px 0 14px;
+  padding: 10px 0 13px;
   background: linear-gradient(
     180deg,
     rgba(251, 245, 236, 0.98),
@@ -265,39 +266,54 @@ button {
 .progress-dot {
   display: grid;
   flex: 0 0 auto;
-  min-width: 48px;
-  height: 26px;
+  width: 18px;
+  height: 18px;
   place-items: center;
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 0 9px;
+  padding: 0;
   background: rgba(255, 255, 255, 0.55);
-  color: var(--muted);
   cursor: pointer;
-  font-size: 0.66rem;
-  font-weight: 800;
   overflow: hidden;
   transition:
     background 180ms ease,
     border-color 180ms ease,
-    color 180ms ease,
     transform 180ms ease;
 }
 
-.progress-dot span {
-  line-height: 1;
-  white-space: nowrap;
+.progress-dot-mark {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(145, 112, 82, 0.42);
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
 }
 
 .progress-dot.is-active {
   border-color: rgba(199, 169, 108, 0.5);
-  background: linear-gradient(90deg, var(--gold), var(--pink-deep));
-  color: #fff;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.progress-dot.is-active .progress-dot-mark {
+  background: linear-gradient(135deg, var(--gold), var(--pink-deep));
+  transform: scale(1.16);
 }
 
 .progress-dot[aria-current="step"] {
   transform: translateY(-1px);
   box-shadow: 0 8px 16px rgba(199, 169, 108, 0.18);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 .title-block {

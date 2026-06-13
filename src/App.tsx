@@ -152,9 +152,11 @@ export default function App() {
                 key={step}
                 type="button"
                 onClick={() => goTo(step)}
+                aria-label={sceneLabels[step]}
                 aria-current={step === visibleScene ? "step" : undefined}
               >
-                <span>{sceneLabels[step]}</span>
+                <span className="sr-only">{sceneLabels[step]}</span>
+                <span className="progress-dot-mark" aria-hidden="true" />
               </button>
             ))}
           </nav>
