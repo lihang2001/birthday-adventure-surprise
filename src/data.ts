@@ -550,9 +550,9 @@ export const memoryPageText = {
 };
 
 export const albumBgm = {
-  src: "/audio/album-bgm.mp3",
-  title: "弹给路小雨的吉他",
-  artist: "Jazzzcz",
+  src: "/audio/album-felicity.mp3",
+  title: "Felicity",
+  artist: "Isaac Shepard",
   playText: "播放 BGM",
   pauseText: "暂停 BGM",
   missingText: "BGM 待放入",
@@ -562,6 +562,13 @@ export const gameBgm = {
   src: "/audio/game-bgm.mp3",
   title: "地上BGM",
   artist: "近藤浩治",
+};
+
+export const finalBgm = {
+  src: "/audio/final-tianxia-wushuang.mp3",
+  title: "天下无双",
+  artist: "陈奕迅",
+  startAt: 203,
 };
 
 export const bossBattle: BattleText = {

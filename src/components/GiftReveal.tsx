@@ -8,6 +8,8 @@ interface GiftRevealProps {
   onContinue: () => void;
 }
 
+const openConfetti = Array.from({ length: 18 }, (_, index) => index + 1);
+
 export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
   const [opened, setOpened] = useState(false);
   const openGift = () => {
@@ -41,6 +43,13 @@ export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
         <span className="gift-bow left" />
         <span className="gift-bow right" />
         <span className="gift-shine" />
+        {opened && (
+          <span className="gift-open-confetti" aria-hidden="true">
+            {openConfetti.map((piece) => (
+              <span className={`confetti-piece c${piece}`} key={piece} />
+            ))}
+          </span>
+        )}
       </button>
 
       {opened && (

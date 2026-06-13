@@ -3,7 +3,8 @@ interface GiftBurstProps {
   variant?: "cream" | "black";
 }
 
-const sparks = Array.from({ length: 10 }, (_, index) => index + 1);
+const sparks = Array.from({ length: 16 }, (_, index) => index + 1);
+const ribbons = Array.from({ length: 8 }, (_, index) => index + 1);
 
 export default function GiftBurst({ label, variant = "cream" }: GiftBurstProps) {
   return (
@@ -11,6 +12,13 @@ export default function GiftBurst({ label, variant = "cream" }: GiftBurstProps) 
       <span className="burst-halo" aria-hidden="true" />
       {sparks.map((spark) => (
         <span className={`burst-spark s${spark}`} key={spark} aria-hidden="true" />
+      ))}
+      {ribbons.map((ribbon) => (
+        <span
+          className={`burst-ribbon r${ribbon}`}
+          key={ribbon}
+          aria-hidden="true"
+        />
       ))}
       <span className="burst-gift" aria-hidden="true">
         <span className="burst-lid" />

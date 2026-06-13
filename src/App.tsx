@@ -13,6 +13,7 @@ import {
   bossBattle,
   collectLevel,
   coverText,
+  finalBgm,
   finalGiftText,
   firstBattle,
   firstGift,
@@ -23,7 +24,14 @@ import {
   secondGift,
   type SceneId,
 } from "./data";
-import { pauseAlbumBgm, pauseGameBgm, playAlbumBgm, playGameBgm } from "./sound";
+import {
+  pauseAlbumBgm,
+  pauseFinalBgm,
+  pauseGameBgm,
+  playAlbumBgm,
+  playFinalBgm,
+  playGameBgm,
+} from "./sound";
 
 const flow: SceneId[] = [
   "cover",
@@ -74,12 +82,19 @@ export default function App() {
     if (next === scene) return;
     if (next === "memoryIntro" || next === "memories") {
       pauseGameBgm();
+      pauseFinalBgm();
       void playAlbumBgm(albumBgm.src);
     } else if (next === "cover") {
       pauseAlbumBgm();
       pauseGameBgm();
+      pauseFinalBgm();
+    } else if (next === "finalGift") {
+      pauseAlbumBgm();
+      pauseGameBgm();
+      void playFinalBgm(finalBgm.src, finalBgm.startAt);
     } else {
       pauseAlbumBgm();
+      pauseFinalBgm();
       void playGameBgm(gameBgm.src);
     }
     setScene(next);

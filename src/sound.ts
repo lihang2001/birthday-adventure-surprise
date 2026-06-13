@@ -18,6 +18,8 @@ const metalSounds = [
 
 const collectGoodSounds = ["/audio/collect-good-1.ogg", "/audio/collect-good-2.ogg"];
 const collectBadSounds = ["/audio/collect-bad-1.ogg"];
+const rewardWowSound = "/audio/reward-wow.mp3";
+const rewardFireworksSound = "/audio/reward-fireworks.wav";
 
 type WebAudioWindow = Window &
   typeof globalThis & {
@@ -32,6 +34,8 @@ let albumAudio: HTMLAudioElement | null = null;
 let albumAudioSrc = "";
 let gameAudio: HTMLAudioElement | null = null;
 let gameAudioSrc = "";
+let finalAudio: HTMLAudioElement | null = null;
+let finalAudioSrc = "";
 const audioCache = new Map<string, HTMLAudioElement>();
 
 function getAudioContext() {
@@ -279,6 +283,8 @@ export function primeGameAudio() {
     ...metalSounds,
     ...collectGoodSounds,
     ...collectBadSounds,
+    rewardWowSound,
+    rewardFireworksSound,
   ].forEach((src) => {
     getAudio(src).load();
   });
@@ -365,14 +371,7 @@ export function playRewardFireworkSound(variant: GiftSoundVariant = "cream") {
   if (now - lastRewardFireworkAt < 420) return;
   lastRewardFireworkAt = now;
 
-  playAsset("/audio/collect-good-2.ogg", {
-    volume: variant === "black" ? 0.56 : 0.7,
-    playbackRate: variant === "black" ? 0.98 : 1.18,
-  });
-  playAsset("/audio/collect-good-1.ogg", {
-    volume: variant === "black" ? 0.42 : 0.52,
-    playbackRate: variant === "black" ? 1.08 : 1.28,
-  });
+  playCelebrationAssets(variant, "burst");
 
   const context = getAudioContext();
   if (!context) return;
@@ -450,14 +449,7 @@ export function playCounterAttackSound(id: BattleSoundId) {
 export function playGiftOpenSound(variant: GiftSoundVariant = "cream") {
   primeGameAudio();
 
-  playAsset("/audio/collect-good-2.ogg", {
-    volume: variant === "black" ? 0.72 : 0.9,
-    playbackRate: variant === "black" ? 0.94 : 1.16,
-  });
-  playAsset("/audio/collect-good-1.ogg", {
-    volume: variant === "black" ? 0.48 : 0.62,
-    playbackRate: variant === "black" ? 1.06 : 1.24,
-  });
+  playCelebrationAssets(variant, "open");
 
   const context = getAudioContext();
   if (!context) return;
@@ -565,6 +557,60 @@ function getGameAudio(src: string) {
   return gameAudio;
 }
 
+function getFinalAudio(src: string) {
+  if (!finalAudio || finalAudioSrc !== src) {
+    finalAudio?.pause();
+    finalAudio = new Audio(src);
+    finalAudio.preload = "auto";
+    finalAudio.loop = true;
+    finalAudio.volume = 0.34;
+    finalAudioSrc = src;
+  }
+
+  return finalAudio;
+}
+
+function seekAudio(audio: HTMLAudioElement, seconds: number) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return;
+
+  const applySeek = () => {
+    try {
+      audio.currentTime = seconds;
+    } catch {
+      audio.addEventListener(
+        "loadedmetadata",
+        () => {
+          try {
+            audio.currentTime = seconds;
+          } catch {
+            // Some browsers reject early media seeking until more data is loaded.
+          }
+        },
+        { once: true },
+      );
+    }
+  };
+
+  applySeek();
+}
+
+function playCelebrationAssets(
+  variant: GiftSoundVariant,
+  phase: "burst" | "open",
+) {
+  const isBlack = variant === "black";
+  const isOpen = phase === "open";
+
+  playAsset(rewardWowSound, {
+    volume: isBlack ? 0.72 : 0.82,
+    playbackRate: isOpen ? 1 : 0.96,
+  });
+  playAsset(rewardFireworksSound, {
+    volume: isBlack ? 0.52 : 0.62,
+    playbackRate: isOpen ? 1.02 : 0.96,
+  });
+}
+
 export async function playGameBgm(src: string): Promise<MediaPlayResult> {
   const audio = getGameAudio(src);
   audio.loop = true;
@@ -586,6 +632,34 @@ export function pauseGameBgm() {
 
 export function isGameBgmPlaying() {
   return Boolean(gameAudio && !gameAudio.paused);
+}
+
+export async function playFinalBgm(
+  src: string,
+  startAt = 0,
+): Promise<MediaPlayResult> {
+  const audio = getFinalAudio(src);
+  audio.loop = true;
+  audio.volume = 0.34;
+
+  if (!audio.paused) return "playing";
+
+  seekAudio(audio, startAt);
+
+  try {
+    await audio.play();
+    return "playing";
+  } catch {
+    return audio.error ? "missing" : "blocked";
+  }
+}
+
+export function pauseFinalBgm() {
+  finalAudio?.pause();
+}
+
+export function isFinalBgmPlaying() {
+  return Boolean(finalAudio && !finalAudio.paused);
 }
 
 export async function playAlbumBgm(src: string): Promise<MediaPlayResult> {

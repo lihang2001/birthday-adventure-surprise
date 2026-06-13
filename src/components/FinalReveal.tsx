@@ -8,6 +8,8 @@ interface FinalRevealProps {
   onRestart: () => void;
 }
 
+const secretConfetti = Array.from({ length: 18 }, (_, index) => index + 1);
+
 function FinalMedia({
   item,
 }: {
@@ -87,6 +89,11 @@ export default function FinalReveal({ text, onRestart }: FinalRevealProps) {
       {secretOpen && (
         <div className="modal-backdrop" role="dialog" aria-modal="true">
           <div className="confirm-modal secret-prize-modal">
+            <span className="secret-prize-confetti" aria-hidden="true">
+              {secretConfetti.map((piece) => (
+                <span className={`confetti-piece c${piece}`} key={piece} />
+              ))}
+            </span>
             <h2>{text.secretTitle}</h2>
             <strong>{text.secretName}</strong>
             <p>{text.secretDescription}</p>
