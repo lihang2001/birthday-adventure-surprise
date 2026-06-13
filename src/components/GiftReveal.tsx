@@ -28,7 +28,7 @@ export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
         window.clearTimeout(popTimerRef.current);
         popTimerRef.current = window.setTimeout(() => {
           setPopVisible(false);
-        }, 2800);
+        }, 1000);
       }
     }
     setOpened(true);

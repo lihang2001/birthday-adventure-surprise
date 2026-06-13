@@ -334,7 +334,7 @@ export default function BattleGame({
             window.clearTimeout(rewardPopTimerRef.current);
             rewardPopTimerRef.current = window.setTimeout(() => {
               setRewardPopVisible(false);
-            }, 2800);
+            }, 1000);
           }
           setDefeated(true);
           window.clearTimeout(rewardReadyRef.current);
