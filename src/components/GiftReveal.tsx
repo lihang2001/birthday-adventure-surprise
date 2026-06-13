@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { GiftReward } from "../data";
-import { playGiftOpenSound } from "../sound";
+import { playGiftOpenSound, primeGameAudio } from "../sound";
 import PlaceholderImage from "./PlaceholderImage";
 import PrizePopImage from "./PrizePopImage";
 
@@ -15,14 +15,18 @@ export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
   const [opened, setOpened] = useState(false);
   const [popVisible, setPopVisible] = useState(false);
   const popTimerRef = useRef<number | undefined>(undefined);
+  const soundFrameRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    return () => window.clearTimeout(popTimerRef.current);
+    primeGameAudio();
+    return () => {
+      window.clearTimeout(popTimerRef.current);
+      window.cancelAnimationFrame(soundFrameRef.current ?? 0);
+    };
   }, []);
 
   const openGift = () => {
     if (!opened) {
-      playGiftOpenSound("cream", reward.soundStyle ?? "default");
       if (reward.popImage) {
         setPopVisible(true);
         window.clearTimeout(popTimerRef.current);
@@ -30,6 +34,10 @@ export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
           setPopVisible(false);
         }, 1000);
       }
+      window.cancelAnimationFrame(soundFrameRef.current ?? 0);
+      soundFrameRef.current = window.requestAnimationFrame(() => {
+        playGiftOpenSound("cream", reward.soundStyle ?? "default");
+      });
     }
     setOpened(true);
   };
@@ -46,6 +54,7 @@ export default function GiftReveal({ reward, onContinue }: GiftRevealProps) {
         className={`gift-box-button ${opened ? "is-open" : ""}`}
         type="button"
         onClick={openGift}
+        onPointerDown={primeGameAudio}
         aria-label="打开第一个礼盒"
       >
         <span className="gift-shadow" />

@@ -22,8 +22,11 @@ const metalSounds = [
 const collectGoodSounds = ["/audio/collect-good-1.ogg", "/audio/collect-good-2.ogg"];
 const collectBadSounds = ["/audio/collect-bad-1.ogg"];
 const rewardWowSound = "/audio/reward-wow.mp3";
+const rewardWowStartAt = 0.05;
 const rewardCustomSound = "/audio/reward-pop-custom.mp4";
+const rewardCustomStartAt = 0.39;
 const rewardFireworksSound = "/audio/reward-fireworks.wav";
+const rewardFireworksStartAt = 0.022;
 
 type WebAudioWindow = Window &
   typeof globalThis & {
@@ -86,17 +89,43 @@ function playAsset(
   {
     volume = 0.8,
     playbackRate = 1,
+    startAt = 0,
   }: {
     volume?: number;
     playbackRate?: number;
+    startAt?: number;
   } = {},
 ) {
   const baseAudio = getAudio(src);
   const audio = baseAudio.cloneNode(true) as HTMLAudioElement;
   audio.volume = Math.min(Math.max(volume, 0), 1);
   audio.playbackRate = playbackRate;
-  audio.currentTime = 0;
+  seekClipToStart(audio, startAt);
   void audio.play().catch(() => undefined);
+}
+
+function seekClipToStart(audio: HTMLAudioElement, startAt: number) {
+  const startSeconds = Math.max(0, startAt);
+  if (startSeconds <= 0) {
+    audio.currentTime = 0;
+    return;
+  }
+
+  try {
+    audio.currentTime = startSeconds;
+  } catch {
+    audio.addEventListener(
+      "loadedmetadata",
+      () => {
+        try {
+          audio.currentTime = startSeconds;
+        } catch {
+          // Ignore seek failures; the clip still plays from the beginning.
+        }
+      },
+      { once: true },
+    );
+  }
 }
 
 function createAssetClip(
@@ -104,16 +133,18 @@ function createAssetClip(
   {
     volume = 0.8,
     playbackRate = 1,
+    startAt = 0,
   }: {
     volume?: number;
     playbackRate?: number;
+    startAt?: number;
   } = {},
 ) {
   const baseAudio = getAudio(src);
   const audio = baseAudio.cloneNode(true) as HTMLAudioElement;
   audio.volume = Math.min(Math.max(volume, 0), 1);
   audio.playbackRate = playbackRate;
-  audio.currentTime = 0;
+  seekClipToStart(audio, startAt);
   return audio;
 }
 
@@ -650,11 +681,13 @@ function playCelebrationAssets(
     {
       volume: useCustomSound ? (isBlack ? 0.15 : 0.18) : isBlack ? 0.22 : 0.28,
       playbackRate: isOpen ? 1 : 0.96,
+      startAt: useCustomSound ? rewardCustomStartAt : rewardWowStartAt,
     },
   );
   const fireworkClip = createAssetClip(rewardFireworksSound, {
     volume: isBlack ? 0.68 : 0.78,
     playbackRate: isOpen ? 1.02 : 0.96,
+    startAt: rewardFireworksStartAt,
   });
 
   playClipsTogether([rewardClip, fireworkClip]);
