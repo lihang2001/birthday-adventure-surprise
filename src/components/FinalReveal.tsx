@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { assetPath } from "../assetPath";
 import type { FinalGiftText } from "../data";
 import { playGiftOpenSound } from "../sound";
+import MessageBoard from "./MessageBoard";
 import PlaceholderImage from "./PlaceholderImage";
 
 interface FinalRevealProps {
@@ -134,6 +135,8 @@ export default function FinalReveal({ text, onRestart }: FinalRevealProps) {
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
+
+        <MessageBoard />
 
         <button className="primary-button" type="button" onClick={onRestart}>
           {text.restartText}
